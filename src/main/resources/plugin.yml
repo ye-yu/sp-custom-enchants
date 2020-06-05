@@ -1,4 +1,4 @@
-name: Custom Enchants
+name: CustomEnchants
 version: ${project.version}
 main: sp.yeyu.customeenchants.customenchants.CustomEnchants
 authors: [YeYu]
