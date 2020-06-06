@@ -1,7 +1,5 @@
 package sp.yeyu.customeenchants.customenchants.enchantments;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
