@@ -73,6 +73,7 @@ public class EnchantManager implements Listener {
 
     @EventHandler
     public void onEnchant(EnchantItemEvent itemEvent) {
+        if (itemEvent.getEnchanter().getLevel() < 30) return;
         final ItemStack item = itemEvent.getItem();
         final Random random = new Random();
         for (CustomEnchants.EnchantEnum ench : CustomEnchants.EnchantEnum.values()) {
