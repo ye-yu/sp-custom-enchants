@@ -3,19 +3,27 @@ package sp.yeyu.customeenchants.customenchants.enchantments;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import sp.yeyu.customeenchants.customenchants.CustomEnchants;
+import sp.yeyu.customeenchants.customenchants.utils.RomanNumeral;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class EnchantManager {
+public class EnchantManager implements Listener {
 
     private static final String REFRESH_RATE_ATTR = "refreshTickRate";
     private static final int DEFAULT_REFRESH_RATE = 5; // apply enchants every 5 server ticks
@@ -49,7 +57,6 @@ public class EnchantManager {
             for (Enchantment ench : item.getEnchantments().keySet()) {
                 if (ench instanceof EnchantWrapper) {
                     EnchantWrapper customEnchant = (EnchantWrapper) ench;
-                    LOGGER.info(String.format("Player %s has equiped %s.", player.getDisplayName(), customEnchant.getName()));
                     if (customEnchant.hasEffect()) {
                         customEnchant.applyEffect(player);
                     }
@@ -60,12 +67,39 @@ public class EnchantManager {
 
     public static List<ItemStack> getEquipments(Player player) {
         final EntityEquipment equipment = player.getEquipment();
-        final List<ItemStack> collect = Stream.of(equipment.getItemInHand(), equipment.getHelmet(), equipment.getChestplate(), equipment.getLeggings(), equipment.getBoots()).filter(Objects::nonNull).collect(Collectors.toList());
-        LOGGER.info(String.format("Player %s has %d equipments.", player.getDisplayName(), collect.size()));
-        return collect;
+        return Stream.of(equipment.getItemInHand(), equipment.getHelmet(), equipment.getChestplate(), equipment.getLeggings(), equipment.getBoots()).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public int getRefreshRate() {
         return refreshRate;
+    }
+
+    @EventHandler
+    public void onEnchant(EnchantItemEvent itemEvent) {
+        LOGGER.info(String.format("%s has enchanted an item.", itemEvent.getEnchanter().getDisplayName()));
+        final ItemStack item = itemEvent.getItem();
+        final Random random = new Random();
+        for (CustomEnchants.Enchants ench: CustomEnchants.Enchants.values()) {
+            final EnchantWrapper enchantment = ench.getEnchantment();
+            if (enchantment.canEnchantItem(item)) {
+                final Double chance = CustomEnchants.CHANCE_DATA.getPlayerData(itemEvent.getEnchanter()).getDoubleOrDefault(EnchantWrapper.getChanceVariableName(enchantment), 0D);
+                final double roll = random.nextDouble() * 100 + 1;
+                LOGGER.info(String.format("Rolled %.02f%% chance of getting %s. Player had %.02f%% chance of getting this enchantment.", roll, enchantment.getName(), chance));
+                if (chance > roll) {
+                    int level = random.nextInt(enchantment.getMaxLevel()) + 1;
+                    ItemMeta meta = item.getItemMeta();
+                    ArrayList<String> lore = new ArrayList<>();
+
+                    if (enchantment.getMaxLevel() > 1)
+                        lore.add(String.format("%s%s %s", ChatColor.GRAY, enchantment.getName(), RomanNumeral.toRoman(level)));
+                    else
+                        lore.add(String.format("%s%s", ChatColor.GRAY, enchantment.getName()));
+                    meta.setLore(lore);
+                    item.setItemMeta(meta);
+                    item.addUnsafeEnchantment(enchantment, level);
+                    LOGGER.info(String.format("Applied %s on %s for player %s", enchantment.getName(), item.getType().getData().getName(), itemEvent.getEnchanter().getDisplayName()));
+                }
+            }
+        }
     }
 }

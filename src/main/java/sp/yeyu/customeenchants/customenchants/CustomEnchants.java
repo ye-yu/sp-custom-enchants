@@ -60,6 +60,8 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents((Listener) Enchants.FOCUS_ENCHANTMENT.getEnchantment(), this);
         getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(EnchantManager.getEnchantManager(), this);
+
 
         final DataStorageInstance data = CHANCE_DATA.getData("dev.txt");
         final int devMode = data.getIntegerOrDefault("devmode", 0);
