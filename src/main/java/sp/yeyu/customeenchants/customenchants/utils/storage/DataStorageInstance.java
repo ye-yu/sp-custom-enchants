@@ -30,8 +30,6 @@ public class DataStorageInstance {
                 if (split.length == 2)
                     data.put(split[0], split[1]);
             }
-
-            LOGGER.info("Reading file: " + Paths.get(directory, filename).toAbsolutePath());
         } catch (IOException io) {
             LOGGER.warn("File " + filename + " does not exists. Creating a blank entry now.");
             //noinspection ResultOfMethodCallIgnored
