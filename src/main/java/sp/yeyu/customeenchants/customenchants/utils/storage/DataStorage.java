@@ -14,8 +14,10 @@ public class DataStorage {
 
     public DataStorageInstance getPlayerData(Player p) {
         final UUID uniqueId = p.getUniqueId();
-        return new DataStorageInstance(uniqueId.toString(), namespace);
+        return getData(uniqueId.toString());
     }
 
-
+    public DataStorageInstance getData(String filename) {
+        return new DataStorageInstance(filename, namespace);
+    }
 }

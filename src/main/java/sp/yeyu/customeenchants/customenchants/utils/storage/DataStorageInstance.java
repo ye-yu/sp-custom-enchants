@@ -40,7 +40,7 @@ public class DataStorageInstance {
 
     public Integer getIntegerOrDefault(String key, Integer def) {
         try {
-            return Integer.parseInt(data.get(key));
+            return Integer.parseInt(data.getOrDefault(key, def.toString()));
         } catch (NumberFormatException e) {
             return def;
         }
@@ -48,7 +48,7 @@ public class DataStorageInstance {
 
     public Double getDoubleOrDefault(String key, Double def) {
         try {
-            return Double.parseDouble(data.get(key));
+            return Double.parseDouble(data.getOrDefault(key, def.toString()));
         } catch (NumberFormatException e) {
             return def;
         }

@@ -8,18 +8,33 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import sp.yeyu.customeenchants.customenchants.commands.BuildChance;
+import sp.yeyu.customeenchants.customenchants.commands.ShowChance;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
 import sp.yeyu.customeenchants.customenchants.enchantments.Focus;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorage;
+import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
 public final class CustomEnchants extends JavaPlugin implements Listener {
-    public static final Enchantment FOCUS_ENCHANTMENT = new Focus(181, "focus");
     private static final Logger LOGGER = LogManager.getLogger(CustomEnchants.class);
     public static final String NAMESPACE = "EnchantPlus";
     public static final DataStorage CHANCE_DATA = new DataStorage(NAMESPACE);
+
+    public enum Enchants {
+        FOCUS_ENCHANTMENT(new Focus(181, "focus"));
+
+        private final EnchantWrapper enchantment;
+        Enchants(EnchantWrapper enchantment) {
+            this.enchantment = enchantment;
+        }
+
+        public EnchantWrapper getEnchantment() {
+            return enchantment;
+        }
+    }
 
     public static void registerEnchantment(Enchantment enchantment) {
         try {
@@ -37,10 +52,22 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
     public void onEnable() {
         // Plugin startup logic
         // registering one enchantment
-        registerEnchantment(FOCUS_ENCHANTMENT);
+        registerEnchantment(Enchants.FOCUS_ENCHANTMENT.getEnchantment());
 
-        getServer().getPluginManager().registerEvents((Listener) FOCUS_ENCHANTMENT, this);
+        getServer().getPluginManager().registerEvents((Listener) Enchants.FOCUS_ENCHANTMENT.getEnchantment(), this);
         getServer().getPluginManager().registerEvents(this, this);
+
+        final DataStorageInstance data = CHANCE_DATA.getData("dev.txt");
+        final int devMode = data.getIntegerOrDefault("devmode", 0);
+        if (devMode == 0) {
+            data.putAttr("devmode", 0);
+        } else {
+            LOGGER.info("(CustomEnchants) Developer mode is on.");
+        }
+
+        getCommand("showchance").setExecutor(new ShowChance());
+        getCommand("buildchance").setExecutor(new BuildChance(devMode != 0));
+
     }
 
     @SuppressWarnings("unchecked")
@@ -55,12 +82,20 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
             HashMap<Integer, Enchantment> byId = (HashMap<Integer, Enchantment>) byIdField.get(null);
             HashMap<String, Enchantment> byName = (HashMap<String, Enchantment>) byNameField.get(null);
 
-            int removeId = ((EnchantWrapper) FOCUS_ENCHANTMENT).getRegisteredId();
+            int removeId = Enchants.FOCUS_ENCHANTMENT.getEnchantment().getRegisteredId();
             byId.remove(removeId);
-            byName.remove(FOCUS_ENCHANTMENT.getName());
+            byName.remove(Enchants.FOCUS_ENCHANTMENT.getEnchantment().getName());
 
         } catch (Exception ignored) {
         }
+    }
+
+    public static EnchantWrapper getEnchantmentByDisplayName(String displayName) {
+        for(Enchants enchantment: Enchants.values()) {
+            if (enchantment.getEnchantment().getName().equalsIgnoreCase(displayName))
+                return enchantment.getEnchantment();
+        }
+        return null;
     }
 
     @EventHandler
