@@ -29,6 +29,17 @@ public abstract class EnchantWrapper extends Enchantment {
         playerData.putAttr(enchantId, newChance);
         return newChance;
     }
+    public static double reduceEnchantmentChanceForPlayer(EnchantWrapper enchantment, Player player, double chance) {
+        String enchantId = EnchantWrapper.getChanceVariableName(enchantment);
+        final DataStorageInstance playerData = CustomEnchants.CHANCE_DATA.getPlayerData(player);
+        double newChance = playerData.getDoubleOrDefault(enchantId, 0D) - chance;
+        newChance = Double.max(newChance, 0D);
+        playerData.putAttr(enchantId, newChance);
+        return newChance;
+    }
+
+
+
 
     public int getRegisteredId() {
         return this.registeredId;

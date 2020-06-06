@@ -92,6 +92,7 @@ public class EnchantManager implements Listener {
                     meta.setLore(lore);
                     item.setItemMeta(meta);
                     item.addUnsafeEnchantment(enchantment, level);
+                    EnchantWrapper.reduceEnchantmentChanceForPlayer(enchantment, itemEvent.getEnchanter(), chance * 0.2);
                 }
             }
         }
