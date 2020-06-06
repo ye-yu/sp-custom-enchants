@@ -3,7 +3,6 @@ package sp.yeyu.customeenchants.customenchants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -11,6 +10,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
 import sp.yeyu.customeenchants.customenchants.enchantments.Focus;
+import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorage;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -18,6 +18,8 @@ import java.util.HashMap;
 public final class CustomEnchants extends JavaPlugin implements Listener {
     public static final Enchantment FOCUS_ENCHANTMENT = new Focus(181, "focus");
     private static final Logger LOGGER = LogManager.getLogger(CustomEnchants.class);
+    public static final String NAMESPACE = "EnchantPlus";
+    public static final DataStorage CHANCE_DATA = new DataStorage(NAMESPACE);
 
     public static void registerEnchantment(Enchantment enchantment) {
         try {

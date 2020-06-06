@@ -6,12 +6,14 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import sp.yeyu.customeenchants.customenchants.CustomEnchants;
 import sp.yeyu.customeenchants.customenchants.utils.EntityUtils;
+import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
 import java.util.Arrays;
 import java.util.List;
@@ -59,6 +61,16 @@ public class Focus extends EnchantWrapper implements Listener {
     public void onLivingEntityHit(EntityDamageByEntityEvent target) {
         if (target.getDamager() instanceof LivingEntity) {
             LivingEntity attacker = (LivingEntity) target.getDamager();
+
+            if (attacker instanceof Player) {
+                final DataStorageInstance playerData = CustomEnchants.CHANCE_DATA.getPlayerData((Player) attacker);
+                String focusUseCountKey = "focusUseCount";
+                final int focusUseCount = playerData.getIntegerOrDefault(focusUseCountKey, 0) + 1;
+                LOGGER.info(String.format("Player %s has used Focus enchant for %d times.", ((Player) attacker).getDisplayName(), focusUseCount));
+                if (!playerData.putAttr(focusUseCountKey, focusUseCount))
+                    LOGGER.error("Cannot write to file " + playerData);
+            }
+
             if (attacker.getEquipment().getItemInHand().containsEnchantment(CustomEnchants.FOCUS_ENCHANTMENT)) {
                 LOGGER.info(String.format("%s attacking %s with Focus enchantment.", attacker.getName(), target.getEntity().getName()));
                 if (!EntityUtils.isValidCritical(attacker)) {
