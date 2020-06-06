@@ -21,7 +21,7 @@ public abstract class EnchantWrapper extends Enchantment {
         return enchant.getVariableName() + "Chance";
     }
 
-    public static double increasePlayerChance(EnchantWrapper enchantment, Player player, double chance) {
+    public static double increaseEnchantmentChanceForPlayer(EnchantWrapper enchantment, Player player, double chance) {
         String enchantId = EnchantWrapper.getChanceVariableName(enchantment);
         final DataStorageInstance playerData = CustomEnchants.CHANCE_DATA.getPlayerData(player);
         double newChance = playerData.getDoubleOrDefault(enchantId, 0D) + chance;

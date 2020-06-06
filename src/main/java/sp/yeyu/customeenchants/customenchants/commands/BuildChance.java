@@ -52,7 +52,7 @@ public class BuildChance implements CommandExecutor {
             return false;
         }
 
-        final double newChance = EnchantWrapper.increasePlayerChance(enchantment, player, increaseChance);
+        final double newChance = EnchantWrapper.increaseEnchantmentChanceForPlayer(enchantment, player, increaseChance);
         sender.sendMessage(String.format("Now %s has %.02f%% chance of getting %s", player.getDisplayName(), newChance, enchantmentName));
         return true;
     }
