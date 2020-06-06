@@ -27,7 +27,7 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
     public static final String NAMESPACE = "EnchantPlus";
     public static final String DEV_DATA_FILENAME = "dev.txt";
     public static final DataStorage CHANCE_DATA = new DataStorage(NAMESPACE);
-    private static final Logger LOGGER = LogManager.getLogger(CustomEnchants.class);
+    public static final Logger LOGGER = LogManager.getLogger(CustomEnchants.class);
     public static CustomEnchants ce;
 
     public static void registerEnchantment(Enchantment enchantment) {

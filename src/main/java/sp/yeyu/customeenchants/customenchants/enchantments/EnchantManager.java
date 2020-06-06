@@ -1,6 +1,8 @@
 package sp.yeyu.customeenchants.customenchants.enchantments;
 
 import com.google.common.collect.Maps;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
@@ -25,11 +27,12 @@ import java.util.stream.Stream;
 
 public class EnchantManager implements Listener {
 
+    private static final Logger LOGGER = LogManager.getLogger(EnchantManager.class);
     private static final EnchantManager MANAGER = new EnchantManager(getRefreshRateFromData());
     private final int refreshRate;
     private final int effectDuration;
 
-    public EnchantManager(HashMap<String, Integer> attributes) {
+    private EnchantManager(HashMap<String, Integer> attributes) {
         this.refreshRate = attributes.get(Attributes.REFRESH_RATE.attrName);
         this.effectDuration = attributes.get(Attributes.EFFECT_DURATION.attrName);
     }
@@ -43,7 +46,14 @@ public class EnchantManager implements Listener {
             data.putAttr(Attributes.EFFECT_DURATION.attrName, Attributes.EFFECT_DURATION.defaultValue);
 
         HashMap<String, Integer> attributes = Maps.newHashMap();
-        attributes.put(Attributes.REFRESH_RATE.attrName, data.getIntegerOrDefault(Attributes.REFRESH_RATE.attrName, Attributes.REFRESH_RATE.defaultValue));
+        Integer refreshRate = data.getIntegerOrDefault(Attributes.REFRESH_RATE.attrName, Attributes.REFRESH_RATE.defaultValue);
+        if (refreshRate < 1) {
+            LOGGER.error("Refresh rate of less than 1 is too quick or unrealistic! Setting refresh rate to default value.");
+            refreshRate = Attributes.REFRESH_RATE.defaultValue;
+            data.putAttr(Attributes.REFRESH_RATE.attrName, Attributes.REFRESH_RATE.defaultValue);
+        }
+
+        attributes.put(Attributes.REFRESH_RATE.attrName, refreshRate);
         attributes.put(Attributes.EFFECT_DURATION.attrName, data.getIntegerOrDefault(Attributes.EFFECT_DURATION.attrName, Attributes.EFFECT_DURATION.defaultValue));
         return attributes;
     }
