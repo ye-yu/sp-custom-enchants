@@ -5,9 +5,9 @@ authors: [YeYu]
 description: Spigot Custom Enchants Plugin
 website: https://github.com/ye-yu/sp-custom-enchants
 commands:
-  showchance:
+  chance:
     description: To show the chance of getting the server's custom enchant in the enchantment table
-    usage: /showchance <enchantment name> like /showchance Insanely Boosted
+    usage: /chance <enchantment name> like /showchance Insanely Boosted
 
   buildchance:
     description: <Dev Mode> To build custom enchantment chance on player.

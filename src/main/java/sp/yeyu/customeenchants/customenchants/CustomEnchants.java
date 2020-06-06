@@ -71,7 +71,7 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
             LOGGER.info("(CustomEnchants) Developer mode is on.");
         }
 
-        getCommand("showchance").setExecutor(new ShowChance());
+        getCommand("chance").setExecutor(new ShowChance());
         getCommand("buildchance").setExecutor(new BuildChance(devMode != 0));
 
         final int repeatingTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, EnchantManager::applyEnchants, 0, EnchantManager.getEnchantManager().getRefreshRate());
