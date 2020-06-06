@@ -48,13 +48,20 @@ public class EnchantManager implements Listener {
         HashMap<String, Integer> attributes = Maps.newHashMap();
         Integer refreshRate = data.getIntegerOrDefault(Attributes.REFRESH_RATE.attrName, Attributes.REFRESH_RATE.defaultValue);
         if (refreshRate < 1) {
-            LOGGER.error("Refresh rate of less than 1 is too quick or unrealistic! Setting refresh rate to default value.");
             refreshRate = Attributes.REFRESH_RATE.defaultValue;
             data.putAttr(Attributes.REFRESH_RATE.attrName, Attributes.REFRESH_RATE.defaultValue);
+            LOGGER.error(String.format("Refresh rate of less than 1 is too quick or unrealistic! Setting refresh rate to %d ticks.", refreshRate));
+        }
+
+        Integer effectDuration = data.getIntegerOrDefault(Attributes.EFFECT_DURATION.attrName, Attributes.EFFECT_DURATION.defaultValue);
+        if (effectDuration < 1) {
+            effectDuration = Attributes.EFFECT_DURATION.defaultValue;
+            data.putAttr(Attributes.EFFECT_DURATION.attrName, Attributes.EFFECT_DURATION.defaultValue);
+            LOGGER.error(String.format("Effect duration cannot be zero ticks or less. Setting effect duration to %d ticks.", effectDuration));
         }
 
         attributes.put(Attributes.REFRESH_RATE.attrName, refreshRate);
-        attributes.put(Attributes.EFFECT_DURATION.attrName, data.getIntegerOrDefault(Attributes.EFFECT_DURATION.attrName, Attributes.EFFECT_DURATION.defaultValue));
+        attributes.put(Attributes.EFFECT_DURATION.attrName, effectDuration);
         return attributes;
     }
 
