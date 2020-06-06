@@ -74,6 +74,8 @@ public class EnchantManager implements Listener {
     @EventHandler
     public void onEnchant(EnchantItemEvent itemEvent) {
         if (itemEvent.getEnchanter().getLevel() < 30) return;
+        if (itemEvent.getEnchantsToAdd().size() > 4) return;
+        int count = 0;
         final ItemStack item = itemEvent.getItem();
         final Random random = new Random();
         for (CustomEnchants.EnchantEnum ench : CustomEnchants.EnchantEnum.values()) {
@@ -94,6 +96,11 @@ public class EnchantManager implements Listener {
                     item.setItemMeta(meta);
                     item.addUnsafeEnchantment(enchantment, level);
                     EnchantWrapper.reduceEnchantmentChanceForPlayer(enchantment, itemEvent.getEnchanter(), chance * 0.2);
+                    count++;
+                }
+
+                if (count + itemEvent.getEnchantsToAdd().size() > 4) {
+                    return;
                 }
             }
         }
