@@ -3,21 +3,28 @@ package sp.yeyu.customeenchants.customenchants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import sp.yeyu.customeenchants.customenchants.commands.BuildChance;
 import sp.yeyu.customeenchants.customenchants.commands.ShowChance;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantManager;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
 import sp.yeyu.customeenchants.customenchants.enchantments.Focus;
+import sp.yeyu.customeenchants.customenchants.enchantments.Springy;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorage;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public final class CustomEnchants extends JavaPlugin implements Listener {
@@ -28,7 +35,8 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
     public static CustomEnchants ce;
 
     public enum Enchants {
-        FOCUS_ENCHANTMENT(new Focus(181, "focus"));
+        FOCUS_ENCHANTMENT(new Focus(131, "focus")),
+        SPRINGY_ENCHANTMENT(new Springy(132, "springy"));
 
         private final EnchantWrapper enchantment;
         Enchants(EnchantWrapper enchantment) {
@@ -59,6 +67,7 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
 
         // registering one enchantment
         registerEnchantment(Enchants.FOCUS_ENCHANTMENT.getEnchantment());
+        registerEnchantment(Enchants.SPRINGY_ENCHANTMENT.getEnchantment());
 
         getServer().getPluginManager().registerEvents((Listener) Enchants.FOCUS_ENCHANTMENT.getEnchantment(), this);
         getServer().getPluginManager().registerEvents(this, this);
@@ -74,7 +83,10 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
         getCommand("showchance").setExecutor(new ShowChance());
         getCommand("buildchance").setExecutor(new BuildChance(devMode != 0));
 
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, EnchantManager::applyEnchants, 1000, EnchantManager.getEnchantManager().getRefreshRate());
+        final int repeatingTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, EnchantManager::applyEnchants, 0, EnchantManager.getEnchantManager().getRefreshRate());
+        if (repeatingTask == -1) {
+            LOGGER.error("Unable to schedule enchantments effect!");
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -107,6 +119,8 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        EnchantManager.applyEnchantsOnPlayer(player);
     }
 
     @EventHandler

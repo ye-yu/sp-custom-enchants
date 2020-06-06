@@ -2,16 +2,24 @@ package sp.yeyu.customeenchants.customenchants.enchantments;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.ItemStack;
 import sp.yeyu.customeenchants.customenchants.CustomEnchants;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class EnchantManager {
 
     private static final EnchantManager MANAGER = new EnchantManager(getRefreshRateFromData());
     private static final String REFRESH_RATE_ATTR = "refreshTickRate";
-    private static final int DEFAULT_REFRESH_RATE = 100; // apply enchants every 50 server ticks
+    private static final int DEFAULT_REFRESH_RATE = 5; // apply enchants every 5 server ticks
     private static final Logger LOGGER = LogManager.getLogger(EnchantManager.class);
 
     private static int getRefreshRateFromData() {
@@ -36,15 +44,29 @@ public class EnchantManager {
     }
 
     public static void applyEnchants() {
-        for(CustomEnchants.Enchants enchantEnum: CustomEnchants.Enchants.values()) {
-            EnchantWrapper enchantment = enchantEnum.getEnchantment();
-            if (enchantment.hasEffect()) {
-                final DataStorageInstance data = CustomEnchants.CHANCE_DATA.getData(enchantment.getVariableName());
-                for(String uuid: data.getKeys()) {
-                    final Player player = JavaPlugin.getPlugin(CustomEnchants.class).getServer().getPlayer(uuid);
-                    enchantment.applyEffect(player);
+        for(Player player: Bukkit.getOnlinePlayers()) {
+            applyEnchantsOnPlayer(player);
+        }
+    }
+
+    public static void applyEnchantsOnPlayer(Player player) {
+        for(ItemStack item: getEquipments(player)) {
+            for(Enchantment ench: item.getEnchantments().keySet()) {
+                if (ench instanceof EnchantWrapper) {
+                    EnchantWrapper customEnchant = (EnchantWrapper)ench;
+                    LOGGER.info(String.format("Player %s has equiped %s.", player.getDisplayName(), customEnchant.getName()));
+                    if (customEnchant.hasEffect()) {
+                        customEnchant.applyEffect(player);
+                    }
                 }
             }
         }
+    }
+
+    public static List<ItemStack> getEquipments(Player player) {
+        final EntityEquipment equipment = player.getEquipment();
+        final List<ItemStack> collect = Stream.of(equipment.getItemInHand(), equipment.getHelmet(), equipment.getChestplate(), equipment.getLeggings(), equipment.getBoots()).filter(Objects::nonNull).collect(Collectors.toList());
+        LOGGER.info(String.format("Player %s has %d equipments.", player.getDisplayName(), collect.size()));
+        return collect;
     }
 }
