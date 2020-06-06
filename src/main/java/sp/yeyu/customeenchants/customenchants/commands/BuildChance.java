@@ -14,8 +14,9 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class BuildChance implements CommandExecutor {
-    private final boolean devMode;
     private static final Logger LOGGER = LogManager.getLogger(BuildChance.class);
+    private final boolean devMode;
+
     public BuildChance(boolean b) {
         devMode = b;
     }

@@ -66,8 +66,8 @@ public class DataStorageInstance {
     }
 
     private boolean writeDataToFile() {
-        try(FileWriter writer = new FileWriter(getFileInstance())) {
-            for (String k: data.keySet()) {
+        try (FileWriter writer = new FileWriter(getFileInstance())) {
+            for (String k : data.keySet()) {
                 LOGGER.info("Writing: " + k + SEPARATOR + data.get(k));
                 writer.write(k + SEPARATOR + data.get(k));
                 writer.write("\n");

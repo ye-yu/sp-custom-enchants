@@ -17,19 +17,6 @@ public abstract class EnchantWrapper extends Enchantment {
         this.registeredId = id;
     }
 
-    public int getRegisteredId() {
-        return this.registeredId;
-    }
-
-    @Override
-    public String getName() {
-        return StringUtils.capitalize(name);
-    }
-
-    public String getVariableName() {
-        return StringUtils.capitalize(name).replace(" ", "");
-    }
-
     public static String getChanceVariableName(EnchantWrapper enchant) {
         return enchant.getVariableName() + "Chance";
     }
@@ -41,6 +28,19 @@ public abstract class EnchantWrapper extends Enchantment {
         newChance = Double.min(newChance, 100D);
         playerData.putAttr(enchantId, newChance);
         return newChance;
+    }
+
+    public int getRegisteredId() {
+        return this.registeredId;
+    }
+
+    @Override
+    public String getName() {
+        return StringUtils.capitalize(name);
+    }
+
+    public String getVariableName() {
+        return StringUtils.capitalize(name).replace(" ", "");
     }
 
     public abstract void applyEffect(Player player);

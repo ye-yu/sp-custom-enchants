@@ -3,16 +3,12 @@ package sp.yeyu.customeenchants.customenchants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import sp.yeyu.customeenchants.customenchants.commands.BuildChance;
 import sp.yeyu.customeenchants.customenchants.commands.ShowChance;
@@ -24,29 +20,14 @@ import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorage;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public final class CustomEnchants extends JavaPlugin implements Listener {
-    private static final Logger LOGGER = LogManager.getLogger(CustomEnchants.class);
     public static final String NAMESPACE = "EnchantPlus";
     public static final String DEV_DATA_FILENAME = "dev.txt";
     public static final DataStorage CHANCE_DATA = new DataStorage(NAMESPACE);
+    private static final Logger LOGGER = LogManager.getLogger(CustomEnchants.class);
     public static CustomEnchants ce;
-
-    public enum Enchants {
-        FOCUS_ENCHANTMENT(new Focus(131, "focus")),
-        SPRINGY_ENCHANTMENT(new Springy(132, "springy"));
-
-        private final EnchantWrapper enchantment;
-        Enchants(EnchantWrapper enchantment) {
-            this.enchantment = enchantment;
-        }
-
-        public EnchantWrapper getEnchantment() {
-            return enchantment;
-        }
-    }
 
     public static void registerEnchantment(Enchantment enchantment) {
         try {
@@ -58,6 +39,14 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static EnchantWrapper getEnchantmentByDisplayName(String displayName) {
+        for (Enchants enchantment : Enchants.values()) {
+            if (enchantment.getEnchantment().getName().equalsIgnoreCase(displayName))
+                return enchantment.getEnchantment();
+        }
+        return null;
     }
 
     @Override
@@ -109,14 +98,6 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
         }
     }
 
-    public static EnchantWrapper getEnchantmentByDisplayName(String displayName) {
-        for(Enchants enchantment: Enchants.values()) {
-            if (enchantment.getEnchantment().getName().equalsIgnoreCase(displayName))
-                return enchantment.getEnchantment();
-        }
-        return null;
-    }
-
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
@@ -125,5 +106,20 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent player) {
+    }
+
+    public enum Enchants {
+        FOCUS_ENCHANTMENT(new Focus(131, "focus")),
+        SPRINGY_ENCHANTMENT(new Springy(132, "springy"));
+
+        private final EnchantWrapper enchantment;
+
+        Enchants(EnchantWrapper enchantment) {
+            this.enchantment = enchantment;
+        }
+
+        public EnchantWrapper getEnchantment() {
+            return enchantment;
+        }
     }
 }

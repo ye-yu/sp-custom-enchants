@@ -14,6 +14,7 @@ import java.util.Objects;
 
 public class Springy extends EnchantWrapper implements Listener {
     private static final Logger LOGGER = LogManager.getLogger(Springy.class);
+
     public Springy(int id, String name) {
         super(id, name);
     }
