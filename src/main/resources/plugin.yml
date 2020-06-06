@@ -12,3 +12,7 @@ commands:
   buildchance:
     description: <Dev Mode> To build custom enchantment chance on player.
     usage: /buildchance <player name> <enchantment name> [<chance percentage to add>] like /buildchance planc_ Insanely Boosted 20.5
+
+  enchants:
+    description: To list down custom enchantments
+    usage: /enchants [<item name>] like /enchants or /enchants Diamond Boots

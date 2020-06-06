@@ -4,12 +4,14 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import sp.yeyu.customeenchants.customenchants.CustomEnchants;
+import sp.yeyu.customeenchants.customenchants.utils.RomanNumeral;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
 public abstract class EnchantWrapper extends Enchantment {
 
     final String name;
     final int registeredId;
+    protected String description;
 
     public EnchantWrapper(int id, String name) {
         super(id);
@@ -29,6 +31,7 @@ public abstract class EnchantWrapper extends Enchantment {
         playerData.putAttr(enchantId, newChance);
         return newChance;
     }
+
     public static double reduceEnchantmentChanceForPlayer(EnchantWrapper enchantment, Player player, double chance) {
         String enchantId = EnchantWrapper.getChanceVariableName(enchantment);
         final DataStorageInstance playerData = CustomEnchants.CHANCE_DATA.getPlayerData(player);
@@ -38,9 +41,11 @@ public abstract class EnchantWrapper extends Enchantment {
         return newChance;
     }
 
-
-
-
+    public String getDescription() {
+        if (getMaxLevel() > 1)
+            return String.format("%s [I-%s] - %s", getName(), RomanNumeral.toRoman(getMaxLevel()), description);
+        return String.format("%s - %s", getName(), description);
+    }
     public int getRegisteredId() {
         return this.registeredId;
     }

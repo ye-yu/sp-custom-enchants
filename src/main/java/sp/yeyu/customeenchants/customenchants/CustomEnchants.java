@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import sp.yeyu.customeenchants.customenchants.commands.BuildChance;
+import sp.yeyu.customeenchants.customenchants.commands.Enchants;
 import sp.yeyu.customeenchants.customenchants.commands.ShowChance;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantManager;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
@@ -73,6 +74,7 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
 
         getCommand("chance").setExecutor(new ShowChance());
         getCommand("buildchance").setExecutor(new BuildChance(devMode != 0));
+        getCommand("enchants").setExecutor(new Enchants());
 
         final int repeatingTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, EnchantManager::applyEnchants, 0, EnchantManager.getEnchantManager().getRefreshRate());
         if (repeatingTask == -1) {

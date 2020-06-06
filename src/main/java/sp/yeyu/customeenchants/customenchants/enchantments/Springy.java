@@ -14,6 +14,7 @@ public class Springy extends EnchantWrapper implements Listener {
 
     public Springy(int id, String name) {
         super(id, name);
+        this.description = "gives a permanent jump boost effect based on the level of enchant";
     }
 
     @Override

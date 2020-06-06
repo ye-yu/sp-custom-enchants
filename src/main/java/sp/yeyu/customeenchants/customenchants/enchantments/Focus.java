@@ -29,6 +29,7 @@ public class Focus extends EnchantWrapper implements Listener {
 
     public Focus(int id, String name) {
         super(id, name);
+        this.description = "applies critical hit on each sword swing";
     }
 
     @Override
