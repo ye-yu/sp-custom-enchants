@@ -28,7 +28,6 @@ public class EnchantManager implements Listener {
     private static final String REFRESH_RATE_ATTR = "refreshTickRate";
     private static final int DEFAULT_REFRESH_RATE = 5; // apply enchants every 5 server ticks
     private static final EnchantManager MANAGER = new EnchantManager(getRefreshRateFromData());
-    private static final Logger LOGGER = LogManager.getLogger(EnchantManager.class);
     private final int refreshRate;
 
     public EnchantManager(int refreshRate) {
@@ -76,7 +75,6 @@ public class EnchantManager implements Listener {
 
     @EventHandler
     public void onEnchant(EnchantItemEvent itemEvent) {
-        LOGGER.info(String.format("%s has enchanted an item.", itemEvent.getEnchanter().getDisplayName()));
         final ItemStack item = itemEvent.getItem();
         final Random random = new Random();
         for (CustomEnchants.EnchantEnum ench : CustomEnchants.EnchantEnum.values()) {
@@ -84,7 +82,6 @@ public class EnchantManager implements Listener {
             if (enchantment.canEnchantItem(item)) {
                 final Double chance = CustomEnchants.CHANCE_DATA.getPlayerData(itemEvent.getEnchanter()).getDoubleOrDefault(EnchantWrapper.getChanceVariableName(enchantment), 0D);
                 final double roll = random.nextDouble() * 100 + 1;
-                LOGGER.info(String.format("Rolled %.02f%% chance of getting %s. Player had %.02f%% chance of getting this enchantment.", roll, enchantment.getName(), chance));
                 if (chance > roll) {
                     int level = random.nextInt(enchantment.getMaxLevel()) + 1;
                     ItemMeta meta = item.getItemMeta();
@@ -97,7 +94,6 @@ public class EnchantManager implements Listener {
                     meta.setLore(lore);
                     item.setItemMeta(meta);
                     item.addUnsafeEnchantment(enchantment, level);
-                    LOGGER.info(String.format("Applied %s on %s for player %s", enchantment.getName(), item.getType().getData().getName(), itemEvent.getEnchanter().getDisplayName()));
                 }
             }
         }

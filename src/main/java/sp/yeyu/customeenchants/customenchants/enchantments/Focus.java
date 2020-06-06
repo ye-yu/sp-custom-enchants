@@ -76,19 +76,15 @@ public class Focus extends EnchantWrapper implements Listener {
                 final DataStorageInstance playerData = CustomEnchants.CHANCE_DATA.getPlayerData((Player) attacker);
                 String focusUseCountKey = "focusUseCount";
                 final int focusUseCount = playerData.getIntegerOrDefault(focusUseCountKey, 0) + 1;
-                LOGGER.info(String.format("Player %s has used Focus enchant for %d times.", ((Player) attacker).getDisplayName(), focusUseCount));
                 if (!playerData.putAttr(focusUseCountKey, focusUseCount))
                     LOGGER.error("Cannot write to file " + playerData);
             }
 
             if (attacker.getEquipment().getItemInHand().containsEnchantment(CustomEnchants.EnchantEnum.FOCUS_ENCHANTMENT.getEnchantment())) {
-                LOGGER.info(String.format("%s attacking %s with Focus enchantment.", attacker.getName(), target.getEntity().getName()));
                 if (!EntityUtils.isValidCritical(attacker)) {
                     LOGGER.info(String.format("Applying critial hits to %s. Damage before: %.02f. Damage after: %.02f", target.getEntity().getName(), target.getDamage(), target.getDamage() * 1.5));
                     double damage = target.getDamage() * 1.5;
                     target.setDamage(damage);
-                } else {
-                    LOGGER.info(String.format("Already performing critial hits on %s.Damage: %.02f", target.getEntity().getName(), target.getDamage()));
                 }
             }
 

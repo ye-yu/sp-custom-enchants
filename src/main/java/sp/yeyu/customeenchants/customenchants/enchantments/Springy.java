@@ -13,7 +13,6 @@ import sp.yeyu.customeenchants.customenchants.CustomEnchants;
 import java.util.Objects;
 
 public class Springy extends EnchantWrapper implements Listener {
-    private static final Logger LOGGER = LogManager.getLogger(Springy.class);
 
     public Springy(int id, String name) {
         super(id, name);
@@ -24,7 +23,6 @@ public class Springy extends EnchantWrapper implements Listener {
         final ItemStack boots = player.getEquipment().getBoots();
         if (Objects.isNull(boots)) return;
         final int level = boots.getEnchantmentLevel(CustomEnchants.EnchantEnum.SPRINGY_ENCHANTMENT.getEnchantment()) - 1;
-        LOGGER.info(String.format("Applying Jump Boost %d to %s", level, player.getDisplayName()));
         player.addPotionEffect(PotionEffectType.JUMP.createEffect(EnchantManager.getEnchantManager().getRefreshRate() + 40, level));
     }
 
