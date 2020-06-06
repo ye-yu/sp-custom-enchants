@@ -1,5 +1,6 @@
 package sp.yeyu.customeenchants.customenchants.enchantments;
 
+import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
@@ -15,6 +16,7 @@ import sp.yeyu.customeenchants.customenchants.utils.RomanNumeral;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -23,20 +25,27 @@ import java.util.stream.Stream;
 
 public class EnchantManager implements Listener {
 
-    private static final String REFRESH_RATE_ATTR = "refreshTickRate";
-    private static final int DEFAULT_REFRESH_RATE = 5; // apply enchants every 5 server ticks
     private static final EnchantManager MANAGER = new EnchantManager(getRefreshRateFromData());
     private final int refreshRate;
+    private final int effectDuration;
 
-    public EnchantManager(int refreshRate) {
-        this.refreshRate = refreshRate;
+    public EnchantManager(HashMap<String, Integer> attributes) {
+        this.refreshRate = attributes.get(Attributes.REFRESH_RATE.attrName);
+        this.effectDuration = attributes.get(Attributes.EFFECT_DURATION.attrName);
     }
 
-    private static int getRefreshRateFromData() {
+    private static HashMap<String, Integer> getRefreshRateFromData() {
         final DataStorageInstance data = CustomEnchants.CHANCE_DATA.getData(CustomEnchants.DEV_DATA_FILENAME);
-        if (!data.hasAttr(REFRESH_RATE_ATTR))
-            data.putAttr(REFRESH_RATE_ATTR, DEFAULT_REFRESH_RATE);
-        return data.getIntegerOrDefault(REFRESH_RATE_ATTR, DEFAULT_REFRESH_RATE);
+        if (!data.hasAttr(Attributes.REFRESH_RATE.attrName))
+            data.putAttr(Attributes.REFRESH_RATE.attrName, Attributes.REFRESH_RATE.defaultValue);
+
+        if (!data.hasAttr(Attributes.EFFECT_DURATION.attrName))
+            data.putAttr(Attributes.EFFECT_DURATION.attrName, Attributes.EFFECT_DURATION.defaultValue);
+
+        HashMap<String, Integer> attributes = Maps.newHashMap();
+        attributes.put(Attributes.REFRESH_RATE.attrName, data.getIntegerOrDefault(Attributes.REFRESH_RATE.attrName, Attributes.REFRESH_RATE.defaultValue));
+        attributes.put(Attributes.EFFECT_DURATION.attrName, data.getIntegerOrDefault(Attributes.EFFECT_DURATION.attrName, Attributes.EFFECT_DURATION.defaultValue));
+        return attributes;
     }
 
     public static EnchantManager getEnchantManager() {
@@ -65,6 +74,14 @@ public class EnchantManager implements Listener {
     public static List<ItemStack> getEquipments(Player player) {
         final EntityEquipment equipment = player.getEquipment();
         return Stream.of(equipment.getItemInHand(), equipment.getHelmet(), equipment.getChestplate(), equipment.getLeggings(), equipment.getBoots()).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    public static int calculateTotalEffectDuration() {
+        return getEnchantManager().getRefreshRate() + getEnchantManager().getEffectDuration();
+    }
+
+    public int getEffectDuration() {
+        return effectDuration;
     }
 
     public int getRefreshRate() {
@@ -103,6 +120,19 @@ public class EnchantManager implements Listener {
                     return;
                 }
             }
+        }
+    }
+
+    private enum Attributes {
+        REFRESH_RATE("refreshTickRate", 5),
+        EFFECT_DURATION("effectDurationTick", 60);
+
+        public final String attrName;
+        public final int defaultValue;
+
+        Attributes(String attrName, int value) {
+            this.attrName = attrName;
+            this.defaultValue = value;
         }
     }
 }

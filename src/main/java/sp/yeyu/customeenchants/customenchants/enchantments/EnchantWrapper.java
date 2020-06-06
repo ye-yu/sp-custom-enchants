@@ -3,7 +3,6 @@ package sp.yeyu.customeenchants.customenchants.enchantments;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import sp.yeyu.customeenchants.customenchants.CustomEnchants;
@@ -44,11 +43,16 @@ public abstract class EnchantWrapper extends Enchantment {
         return newChance;
     }
 
+    public static boolean isBook(ItemStack item) {
+        return item.getType() == Material.BOOK || item.getType() == Material.ENCHANTED_BOOK;
+    }
+
     public String getDescription() {
         if (getMaxLevel() > 1)
             return String.format("%s [I-%s] - %s", getName(), RomanNumeral.toRoman(getMaxLevel()), description);
         return String.format("%s - %s", getName(), description);
     }
+
     public int getRegisteredId() {
         return this.registeredId;
     }
@@ -65,8 +69,4 @@ public abstract class EnchantWrapper extends Enchantment {
     public abstract void applyEffect(Player player);
 
     public abstract boolean hasEffect();
-
-    public static boolean isBook(ItemStack item) {
-        return item.getType() == Material.BOOK || item.getType() == Material.ENCHANTED_BOOK;
-    }
 }

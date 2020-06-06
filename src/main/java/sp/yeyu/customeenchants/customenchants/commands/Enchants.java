@@ -13,6 +13,7 @@ import java.util.Objects;
 
 public class Enchants implements CommandExecutor {
     private static final String HEADER = "List of enchantments";
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length > 0)
@@ -22,7 +23,7 @@ public class Enchants implements CommandExecutor {
 
     private boolean listEnchants(CommandSender sender) {
         StringBuilder message = new StringBuilder(HEADER + ":\n");
-        for(CustomEnchants.EnchantEnum ench: CustomEnchants.EnchantEnum.values()) {
+        for (CustomEnchants.EnchantEnum ench : CustomEnchants.EnchantEnum.values()) {
             message.append(ench.getEnchantment().getDescription()).append("\n");
         }
         sender.sendMessage(message.toString());
@@ -38,7 +39,7 @@ public class Enchants implements CommandExecutor {
         }
         final ItemStack itemStack = new ItemStack(material);
         StringBuilder message = new StringBuilder(HEADER + " for " + itemName + ":\n");
-        for(CustomEnchants.EnchantEnum ench: CustomEnchants.EnchantEnum.values()) {
+        for (CustomEnchants.EnchantEnum ench : CustomEnchants.EnchantEnum.values()) {
             final EnchantWrapper enchantment = ench.getEnchantment();
             if (enchantment.canEnchantItem(itemStack))
                 message.append(enchantment.getDescription()).append("\n");
