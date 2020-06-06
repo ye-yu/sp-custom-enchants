@@ -52,6 +52,6 @@ public class Springy extends EnchantWrapper implements Listener {
 
     @Override
     public boolean canEnchantItem(ItemStack item) {
-        return getItemTarget().includes(item);
+        return getItemTarget().includes(item) || EnchantWrapper.isBook(item);
     }
 }

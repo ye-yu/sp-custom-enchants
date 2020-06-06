@@ -2,7 +2,6 @@ package sp.yeyu.customeenchants.customenchants.enchantments;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
@@ -14,18 +13,8 @@ import org.bukkit.inventory.ItemStack;
 import sp.yeyu.customeenchants.customenchants.CustomEnchants;
 import sp.yeyu.customeenchants.customenchants.utils.EntityUtils;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class Focus extends EnchantWrapper implements Listener {
     private static final Logger LOGGER = LogManager.getLogger(Focus.class);
-
-    private static final List<Material> VALID_ITEMS = Arrays.asList(
-            Material.WOOD_SWORD,
-            Material.STONE_SWORD,
-            Material.IRON_SWORD,
-            Material.GOLD_SWORD,
-            Material.DIAMOND_SWORD);
 
     public Focus(int id, String name) {
         super(id, name);
@@ -64,7 +53,7 @@ public class Focus extends EnchantWrapper implements Listener {
 
     @Override
     public boolean canEnchantItem(ItemStack item) {
-        return VALID_ITEMS.contains(item.getType());
+        return getItemTarget().includes(item) || EnchantWrapper.isBook(item);
     }
 
     @EventHandler
