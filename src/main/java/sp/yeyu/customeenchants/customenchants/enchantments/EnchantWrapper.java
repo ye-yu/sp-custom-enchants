@@ -42,4 +42,8 @@ public abstract class EnchantWrapper extends Enchantment {
         playerData.putAttr(enchantId, newChance);
         return newChance;
     }
+
+    public abstract void applyEffect(Player player);
+
+    public abstract boolean hasEffect();
 }

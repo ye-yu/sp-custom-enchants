@@ -8,6 +8,7 @@ import java.io.*;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.Set;
 
 public class DataStorageInstance {
     private static final Logger LOGGER = LogManager.getLogger(DataStorageInstance.class);
@@ -80,6 +81,14 @@ public class DataStorageInstance {
                 FILENAME,
                 DIRECTORY,
                 Paths.get(DIRECTORY, FILENAME).toAbsolutePath());
+    }
+
+    public boolean hasAttr(String key) {
+        return data.containsKey(key);
+    }
+
+    public Set<String> getKeys() {
+        return data.keySet();
     }
 
     public File getFileInstance() {

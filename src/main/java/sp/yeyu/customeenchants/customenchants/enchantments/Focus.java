@@ -33,6 +33,16 @@ public class Focus extends EnchantWrapper implements Listener {
     }
 
     @Override
+    public void applyEffect(Player player) {
+
+    }
+
+    @Override
+    public boolean hasEffect() {
+        return false;
+    }
+
+    @Override
     public int getMaxLevel() {
         return 1;
     }

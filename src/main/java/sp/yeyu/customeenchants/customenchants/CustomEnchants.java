@@ -2,6 +2,7 @@ package sp.yeyu.customeenchants.customenchants;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -10,6 +11,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import sp.yeyu.customeenchants.customenchants.commands.BuildChance;
 import sp.yeyu.customeenchants.customenchants.commands.ShowChance;
+import sp.yeyu.customeenchants.customenchants.enchantments.EnchantManager;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
 import sp.yeyu.customeenchants.customenchants.enchantments.Focus;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorage;
@@ -21,7 +23,9 @@ import java.util.HashMap;
 public final class CustomEnchants extends JavaPlugin implements Listener {
     private static final Logger LOGGER = LogManager.getLogger(CustomEnchants.class);
     public static final String NAMESPACE = "EnchantPlus";
+    public static final String DEV_DATA_FILENAME = "dev.txt";
     public static final DataStorage CHANCE_DATA = new DataStorage(NAMESPACE);
+    public static CustomEnchants ce;
 
     public enum Enchants {
         FOCUS_ENCHANTMENT(new Focus(181, "focus"));
@@ -51,6 +55,8 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         // Plugin startup logic
+        ce = this;
+
         // registering one enchantment
         registerEnchantment(Enchants.FOCUS_ENCHANTMENT.getEnchantment());
 
@@ -68,6 +74,7 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
         getCommand("showchance").setExecutor(new ShowChance());
         getCommand("buildchance").setExecutor(new BuildChance(devMode != 0));
 
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, EnchantManager::applyEnchants, 1000, EnchantManager.getEnchantManager().getRefreshRate());
     }
 
     @SuppressWarnings("unchecked")
