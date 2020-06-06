@@ -42,7 +42,7 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
     }
 
     public static EnchantWrapper getEnchantmentByDisplayName(String displayName) {
-        for (Enchants enchantment : Enchants.values()) {
+        for (EnchantEnum enchantment : EnchantEnum.values()) {
             if (enchantment.getEnchantment().getName().equalsIgnoreCase(displayName))
                 return enchantment.getEnchantment();
         }
@@ -55,10 +55,10 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
         ce = this;
 
         // registering one enchantment
-        registerEnchantment(Enchants.FOCUS_ENCHANTMENT.getEnchantment());
-        registerEnchantment(Enchants.SPRINGY_ENCHANTMENT.getEnchantment());
+        registerEnchantment(EnchantEnum.FOCUS_ENCHANTMENT.getEnchantment());
+        registerEnchantment(EnchantEnum.SPRINGY_ENCHANTMENT.getEnchantment());
 
-        getServer().getPluginManager().registerEvents((Listener) Enchants.FOCUS_ENCHANTMENT.getEnchantment(), this);
+        getServer().getPluginManager().registerEvents((Listener) EnchantEnum.FOCUS_ENCHANTMENT.getEnchantment(), this);
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(EnchantManager.getEnchantManager(), this);
 
@@ -92,9 +92,9 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
             HashMap<Integer, Enchantment> byId = (HashMap<Integer, Enchantment>) byIdField.get(null);
             HashMap<String, Enchantment> byName = (HashMap<String, Enchantment>) byNameField.get(null);
 
-            int removeId = Enchants.FOCUS_ENCHANTMENT.getEnchantment().getRegisteredId();
+            int removeId = EnchantEnum.FOCUS_ENCHANTMENT.getEnchantment().getRegisteredId();
             byId.remove(removeId);
-            byName.remove(Enchants.FOCUS_ENCHANTMENT.getEnchantment().getName());
+            byName.remove(EnchantEnum.FOCUS_ENCHANTMENT.getEnchantment().getName());
 
         } catch (Exception ignored) {
         }
@@ -110,13 +110,13 @@ public final class CustomEnchants extends JavaPlugin implements Listener {
     public void onQuit(PlayerQuitEvent player) {
     }
 
-    public enum Enchants {
+    public enum EnchantEnum {
         FOCUS_ENCHANTMENT(new Focus(131, "focus")),
         SPRINGY_ENCHANTMENT(new Springy(132, "springy"));
 
         private final EnchantWrapper enchantment;
 
-        Enchants(EnchantWrapper enchantment) {
+        EnchantEnum(EnchantWrapper enchantment) {
             this.enchantment = enchantment;
         }
 

@@ -23,7 +23,7 @@ public class Springy extends EnchantWrapper implements Listener {
     public void applyEffect(Player player) {
         final ItemStack boots = player.getEquipment().getBoots();
         if (Objects.isNull(boots)) return;
-        final int level = boots.getEnchantmentLevel(CustomEnchants.Enchants.SPRINGY_ENCHANTMENT.getEnchantment()) - 1;
+        final int level = boots.getEnchantmentLevel(CustomEnchants.EnchantEnum.SPRINGY_ENCHANTMENT.getEnchantment()) - 1;
         LOGGER.info(String.format("Applying Jump Boost %d to %s", level, player.getDisplayName()));
         player.addPotionEffect(PotionEffectType.JUMP.createEffect(EnchantManager.getEnchantManager().getRefreshRate() + 40, level));
     }

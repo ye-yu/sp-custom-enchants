@@ -79,7 +79,7 @@ public class EnchantManager implements Listener {
         LOGGER.info(String.format("%s has enchanted an item.", itemEvent.getEnchanter().getDisplayName()));
         final ItemStack item = itemEvent.getItem();
         final Random random = new Random();
-        for (CustomEnchants.Enchants ench: CustomEnchants.Enchants.values()) {
+        for (CustomEnchants.EnchantEnum ench : CustomEnchants.EnchantEnum.values()) {
             final EnchantWrapper enchantment = ench.getEnchantment();
             if (enchantment.canEnchantItem(item)) {
                 final Double chance = CustomEnchants.CHANCE_DATA.getPlayerData(itemEvent.getEnchanter()).getDoubleOrDefault(EnchantWrapper.getChanceVariableName(enchantment), 0D);
