@@ -38,6 +38,8 @@ public class EnchantManager implements Listener {
     private static final Logger LOGGER = LogManager.getLogger(EnchantManager.class);
     private static final EnchantManager MANAGER = new EnchantManager(getRefreshRateFromData());
     private static final HashMap<Player, ArrayList<ItemStack>> enchantSchedule = Maps.newHashMap();
+    private static final HashMap<Player, ItemStack> pickUpSchedule = Maps.newHashMap();
+
     private final int refreshRate;
     private final int effectDuration;
 
@@ -125,6 +127,7 @@ public class EnchantManager implements Listener {
 
         AnvilInventory anvil = (AnvilInventory) inv;
         if (e.getRawSlot() == 2) {
+            e.setResult(Event.Result.DENY);
             whenClickingResultingItem(e, anvil, player);
         } else {
             whenClickingAnvilSlot(e, anvil, player);
@@ -133,6 +136,7 @@ public class EnchantManager implements Listener {
 
     private static void whenClickingResultingItem(InventoryClickEvent e, AnvilInventory anvil, Player player) {
         final ArrayList<ItemStack> enchantSlots = enchantSchedule.get(player);
+        if (Objects.isNull(enchantSlots)) return;
         if (enchantSlots.size() == 2) {
             // display the third slot yet
             ItemStack leftItem = enchantSlots.get(0);
@@ -176,28 +180,23 @@ public class EnchantManager implements Listener {
                 player.closeInventory();
             }
         }
-        e.setResult(Event.Result.DENY);
     }
 
     private static void whenClickingAnvilSlot(InventoryClickEvent e, AnvilInventory anvil, Player player) {
         enchantSchedule.remove(player); // always reset when user perform inventory change
         if (e.getRawSlot() < 2) {
-            LOGGER.info("Player is clicking from the anvil slots.");
-            if (Arrays.asList(InventoryAction.PLACE_ALL, InventoryAction.PLACE_SOME, InventoryAction.PLACE_ONE).contains(e.getAction())) {
-                insertItemInAnvilThirdSlot(e, anvil, player);
-            } else if (e.getAction().equals(InventoryAction.SWAP_WITH_CURSOR)) {
-                insertItemInAnvilThirdSlot(e, anvil, player);
-                final int target = e.getRawSlot();
-                if (target == 0) {
-                    enchantSchedule.put(player, Lists.newArrayList(e.getCurrentItem(), enchantSchedule.get(player).get(1)));
-                } else {
-                    enchantSchedule.put(player, Lists.newArrayList(enchantSchedule.get(player).get(0), e.getCurrentItem()));
-                }
+            LOGGER.info(String.format("Player is clicking from the anvil slots. %s", e.getAction()));
+            if (Arrays.asList(InventoryAction.PLACE_ALL, InventoryAction.PLACE_SOME, InventoryAction.PLACE_ONE, InventoryAction.SWAP_WITH_CURSOR).contains(e.getAction())) {
+                insertItemInAnvilThirdSlot(anvil.getItem(0), anvil.getItem(1), e.getRawSlot(), player);
+            } else if (Arrays.asList(InventoryAction.PICKUP_ALL, InventoryAction.PICKUP_HALF, InventoryAction.PICKUP_SOME, InventoryAction.PICKUP_HALF, InventoryAction.PICKUP_ONE).contains(e.getAction())) {
+                pickUpSchedule.put(player, e.getCurrentItem());
             }
         } else {
             LOGGER.info("Player is clicking from their inventory slots.");
             if (e.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
-                insertItemInAnvilThirdSlot(e, anvil, player);
+                insertItemInAnvilThirdSlotFromShiftClick(e, anvil, player);
+            } else if (Arrays.asList(InventoryAction.PICKUP_ALL, InventoryAction.PICKUP_HALF, InventoryAction.PICKUP_SOME, InventoryAction.PICKUP_HALF, InventoryAction.PICKUP_ONE).contains(e.getAction())) {
+                pickUpSchedule.put(player, e.getCurrentItem());
             }
         }
 
@@ -244,8 +243,20 @@ public class EnchantManager implements Listener {
         itemStack.setItemMeta(meta);
         return itemStack;
     }
-
-    private static void insertItemInAnvilThirdSlot(InventoryClickEvent e, AnvilInventory anvil, Player player) {
+    private static void insertItemInAnvilThirdSlot(ItemStack leftItem, ItemStack rightItem, int rawSlot, Player player) {
+        if (Objects.isNull(leftItem) && Objects.isNull(rightItem)) return;
+        if (!pickUpSchedule.containsKey(player)) return;
+        ItemStack currentItem = pickUpSchedule.remove(player);
+        if (rawSlot == 1) {
+            enchantSchedule.put(player, Lists.newArrayList(leftItem, currentItem));
+            LOGGER.info(String.format("Anvil now has %s in the left slot and %s in the right slot.", leftItem, currentItem));
+        } else {
+            enchantSchedule.put(player, Lists.newArrayList(currentItem, rightItem));
+            LOGGER.info(String.format("Anvil now has %s in the left slot and %s in the right slot.", currentItem, rightItem));
+        }
+        LOGGER.info(String.format("Anvil actually has %s in the left slot and %s in the right slot.", leftItem, rightItem));
+    }
+    private static void insertItemInAnvilThirdSlotFromShiftClick(InventoryClickEvent e, AnvilInventory anvil, Player player) {
         if (Objects.isNull(anvil.getItem(0)) && Objects.isNull(anvil.getItem(1))) {
             enchantSchedule.remove(player);
             return;
@@ -253,7 +264,6 @@ public class EnchantManager implements Listener {
         ItemStack leftItem;
         ItemStack rightItem;
         if (Objects.nonNull(anvil.getItem(0)) && Objects.nonNull(anvil.getItem(1))) {
-            LOGGER.info("Anvil slots are already occupied.");
             leftItem = anvil.getItem(0);
             rightItem = anvil.getItem(1);
         } else {
@@ -265,7 +275,6 @@ public class EnchantManager implements Listener {
                 rightItem = e.getCurrentItem();
             }
         }
-        LOGGER.info(String.format("Anvil is now having %s in their left slot and %s in their right slot.", leftItem.getType(), rightItem.getType()));
         enchantSchedule.put(player, Lists.newArrayList(leftItem, rightItem));
     }
 
