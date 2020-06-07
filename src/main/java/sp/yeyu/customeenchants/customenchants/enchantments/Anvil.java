@@ -22,7 +22,7 @@ public class Anvil extends EnchantWrapper {
 
     @Override
     public int getMaxLevel() {
-        return 0;
+        return 1;
     }
 
     @Override
