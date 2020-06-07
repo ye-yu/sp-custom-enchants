@@ -38,7 +38,7 @@ public class EnchantManager implements Listener {
     }
 
     private static HashMap<String, Integer> getRefreshRateFromData() {
-        final DataStorageInstance data = EnchantPlus.CHANCE_DATA.getData(EnchantPlus.DEV_DATA_FILENAME);
+        final DataStorageInstance data = EnchantPlus.getChanceData().getData(EnchantPlus.DEV_DATA_FILENAME);
         if (!data.hasAttr(Attributes.REFRESH_RATE.attrName))
             data.putAttr(Attributes.REFRESH_RATE.attrName, Attributes.REFRESH_RATE.defaultValue);
 
@@ -115,7 +115,7 @@ public class EnchantManager implements Listener {
         for (EnchantPlus.EnchantEnum ench : EnchantPlus.EnchantEnum.values()) {
             final EnchantWrapper enchantment = ench.getEnchantment();
             if (enchantment.canEnchantItem(item)) {
-                final Double chance = EnchantPlus.CHANCE_DATA.getPlayerData(itemEvent.getEnchanter()).getDoubleOrDefault(EnchantWrapper.getChanceVariableName(enchantment), 0D);
+                final Double chance = EnchantPlus.getChanceData().getPlayerData(itemEvent.getEnchanter()).getDoubleOrDefault(EnchantWrapper.getChanceVariableName(enchantment), 0D);
                 final double roll = random.nextDouble() * 100 + 1;
                 if (chance > roll) {
                     int level = random.nextInt(enchantment.getMaxLevel()) + 1;

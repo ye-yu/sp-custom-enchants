@@ -24,11 +24,10 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 
 public final class EnchantPlus extends JavaPlugin implements Listener {
-    public static final String NAMESPACE = "EnchantPlus";
     public static final String DEV_DATA_FILENAME = "dev.txt";
-    public static final DataStorage CHANCE_DATA = new DataStorage(NAMESPACE);
     public static final Logger LOGGER = LogManager.getLogger(EnchantPlus.class);
     public static EnchantPlus ce;
+    private static DataStorage CHANCE_DATA;
 
     public static void registerEnchantment(Enchantment enchantment) {
         try {
@@ -50,9 +49,14 @@ public final class EnchantPlus extends JavaPlugin implements Listener {
         return null;
     }
 
+    public static DataStorage getChanceData() {
+        return CHANCE_DATA;
+    }
+
     @Override
     public void onEnable() {
         // Plugin startup logic
+        CHANCE_DATA = new DataStorage(getName());
         ce = this;
 
         // registering one enchantment

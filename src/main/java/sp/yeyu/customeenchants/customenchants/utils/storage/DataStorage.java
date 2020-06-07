@@ -24,9 +24,9 @@ public class DataStorage {
         final File dataFolder = JavaPlugin.getPlugin(EnchantPlus.class).getDataFolder();
         if (!dataFolder.exists()) {
             if (dataFolder.mkdir()) {
-                return new DataStorageInstance(filename, dataFolder.toPath().resolve(namespace).toAbsolutePath().toString());
+                return new DataStorageInstance(filename, dataFolder.toPath().toAbsolutePath().toString());
             }
         }
-        return new DataStorageInstance(filename, dataFolder.toPath().resolve(namespace).toAbsolutePath().toString());
+        return new DataStorageInstance(filename, dataFolder.toPath().toAbsolutePath().toString());
     }
 }

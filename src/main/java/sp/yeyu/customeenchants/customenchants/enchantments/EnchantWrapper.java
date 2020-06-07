@@ -27,7 +27,7 @@ public abstract class EnchantWrapper extends Enchantment {
 
     public static double increaseEnchantmentChanceForPlayer(EnchantWrapper enchantment, Player player, double chance) {
         String enchantId = EnchantWrapper.getChanceVariableName(enchantment);
-        final DataStorageInstance playerData = EnchantPlus.CHANCE_DATA.getPlayerData(player);
+        final DataStorageInstance playerData = EnchantPlus.getChanceData().getPlayerData(player);
         double newChance = playerData.getDoubleOrDefault(enchantId, 0D) + chance;
         newChance = Double.min(newChance, 100D);
         playerData.putAttr(enchantId, newChance);
@@ -36,7 +36,7 @@ public abstract class EnchantWrapper extends Enchantment {
 
     public static double reduceEnchantmentChanceForPlayer(EnchantWrapper enchantment, Player player, double chance) {
         String enchantId = EnchantWrapper.getChanceVariableName(enchantment);
-        final DataStorageInstance playerData = EnchantPlus.CHANCE_DATA.getPlayerData(player);
+        final DataStorageInstance playerData = EnchantPlus.getChanceData().getPlayerData(player);
         double newChance = playerData.getDoubleOrDefault(enchantId, 0D) - chance;
         newChance = Double.max(newChance, 0D);
         playerData.putAttr(enchantId, newChance);
