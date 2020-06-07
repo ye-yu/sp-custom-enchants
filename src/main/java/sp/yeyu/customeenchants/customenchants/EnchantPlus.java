@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import sp.yeyu.customeenchants.customenchants.commands.BuildChance;
 import sp.yeyu.customeenchants.customenchants.commands.Enchants;
 import sp.yeyu.customeenchants.customenchants.commands.ShowChance;
+import sp.yeyu.customeenchants.customenchants.enchantments.Anvil;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantManager;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
 import sp.yeyu.customeenchants.customenchants.enchantments.Focus;
@@ -118,7 +119,8 @@ public final class EnchantPlus extends JavaPlugin implements Listener {
 
     public enum EnchantEnum {
         FOCUS_ENCHANTMENT(new Focus(131, "focus")),
-        SPRINGY_ENCHANTMENT(new Springy(132, "springy"));
+        SPRINGY_ENCHANTMENT(new Springy(132, "springy")),
+        ANVIL_TAG(new Anvil(130, "anvil"));
 
         private final EnchantWrapper enchantment;
 
