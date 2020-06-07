@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import sp.yeyu.customeenchants.customenchants.CustomEnchants;
+import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 import sp.yeyu.customeenchants.customenchants.utils.RomanNumeral;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
@@ -27,7 +27,7 @@ public abstract class EnchantWrapper extends Enchantment {
 
     public static double increaseEnchantmentChanceForPlayer(EnchantWrapper enchantment, Player player, double chance) {
         String enchantId = EnchantWrapper.getChanceVariableName(enchantment);
-        final DataStorageInstance playerData = CustomEnchants.CHANCE_DATA.getPlayerData(player);
+        final DataStorageInstance playerData = EnchantPlus.CHANCE_DATA.getPlayerData(player);
         double newChance = playerData.getDoubleOrDefault(enchantId, 0D) + chance;
         newChance = Double.min(newChance, 100D);
         playerData.putAttr(enchantId, newChance);
@@ -36,7 +36,7 @@ public abstract class EnchantWrapper extends Enchantment {
 
     public static double reduceEnchantmentChanceForPlayer(EnchantWrapper enchantment, Player player, double chance) {
         String enchantId = EnchantWrapper.getChanceVariableName(enchantment);
-        final DataStorageInstance playerData = CustomEnchants.CHANCE_DATA.getPlayerData(player);
+        final DataStorageInstance playerData = EnchantPlus.CHANCE_DATA.getPlayerData(player);
         double newChance = playerData.getDoubleOrDefault(enchantId, 0D) - chance;
         newChance = Double.max(newChance, 0D);
         playerData.putAttr(enchantId, newChance);

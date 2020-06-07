@@ -10,7 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
-import sp.yeyu.customeenchants.customenchants.CustomEnchants;
+import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 import sp.yeyu.customeenchants.customenchants.utils.EntityUtils;
 
 public class Focus extends EnchantWrapper implements Listener {
@@ -60,7 +60,7 @@ public class Focus extends EnchantWrapper implements Listener {
     public void onLivingEntityHit(EntityDamageByEntityEvent target) {
         if (target.getDamager() instanceof LivingEntity) {
             LivingEntity attacker = (LivingEntity) target.getDamager();
-            if (attacker.getEquipment().getItemInHand().containsEnchantment(CustomEnchants.EnchantEnum.FOCUS_ENCHANTMENT.getEnchantment())) {
+            if (attacker.getEquipment().getItemInHand().containsEnchantment(EnchantPlus.EnchantEnum.FOCUS_ENCHANTMENT.getEnchantment())) {
                 if (!EntityUtils.isValidCritical(attacker)) {
                     LOGGER.info(String.format("Applying critial hits to %s. Damage before: %.02f. Damage after: %.02f", target.getEntity().getName(), target.getDamage(), target.getDamage() * 1.5));
                     double damage = target.getDamage() * 1.5;

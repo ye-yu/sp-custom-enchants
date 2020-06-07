@@ -13,7 +13,7 @@ import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import sp.yeyu.customeenchants.customenchants.CustomEnchants;
+import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 import sp.yeyu.customeenchants.customenchants.utils.RomanNumeral;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
@@ -38,7 +38,7 @@ public class EnchantManager implements Listener {
     }
 
     private static HashMap<String, Integer> getRefreshRateFromData() {
-        final DataStorageInstance data = CustomEnchants.CHANCE_DATA.getData(CustomEnchants.DEV_DATA_FILENAME);
+        final DataStorageInstance data = EnchantPlus.CHANCE_DATA.getData(EnchantPlus.DEV_DATA_FILENAME);
         if (!data.hasAttr(Attributes.REFRESH_RATE.attrName))
             data.putAttr(Attributes.REFRESH_RATE.attrName, Attributes.REFRESH_RATE.defaultValue);
 
@@ -112,10 +112,10 @@ public class EnchantManager implements Listener {
         int count = 0;
         final ItemStack item = itemEvent.getItem();
         final Random random = new Random();
-        for (CustomEnchants.EnchantEnum ench : CustomEnchants.EnchantEnum.values()) {
+        for (EnchantPlus.EnchantEnum ench : EnchantPlus.EnchantEnum.values()) {
             final EnchantWrapper enchantment = ench.getEnchantment();
             if (enchantment.canEnchantItem(item)) {
-                final Double chance = CustomEnchants.CHANCE_DATA.getPlayerData(itemEvent.getEnchanter()).getDoubleOrDefault(EnchantWrapper.getChanceVariableName(enchantment), 0D);
+                final Double chance = EnchantPlus.CHANCE_DATA.getPlayerData(itemEvent.getEnchanter()).getDoubleOrDefault(EnchantWrapper.getChanceVariableName(enchantment), 0D);
                 final double roll = random.nextDouble() * 100 + 1;
                 if (chance > roll) {
                     int level = random.nextInt(enchantment.getMaxLevel()) + 1;

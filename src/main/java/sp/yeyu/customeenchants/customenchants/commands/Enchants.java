@@ -6,7 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
-import sp.yeyu.customeenchants.customenchants.CustomEnchants;
+import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
 
 import java.util.Objects;
@@ -23,7 +23,7 @@ public class Enchants implements CommandExecutor {
 
     private boolean listEnchants(CommandSender sender) {
         StringBuilder message = new StringBuilder(HEADER + ":\n");
-        for (CustomEnchants.EnchantEnum ench : CustomEnchants.EnchantEnum.values()) {
+        for (EnchantPlus.EnchantEnum ench : EnchantPlus.EnchantEnum.values()) {
             message.append(ench.getEnchantment().getDescription()).append("\n");
         }
         sender.sendMessage(message.toString());
@@ -39,7 +39,7 @@ public class Enchants implements CommandExecutor {
         }
         final ItemStack itemStack = new ItemStack(material);
         StringBuilder message = new StringBuilder(HEADER + " for " + itemName + ":\n");
-        for (CustomEnchants.EnchantEnum ench : CustomEnchants.EnchantEnum.values()) {
+        for (EnchantPlus.EnchantEnum ench : EnchantPlus.EnchantEnum.values()) {
             final EnchantWrapper enchantment = ench.getEnchantment();
             if (enchantment.canEnchantItem(itemStack))
                 message.append(enchantment.getDescription()).append("\n");

@@ -1,6 +1,6 @@
-name: CustomEnchants
+name: EnchantPlus
 version: ${project.version}
-main: sp.yeyu.customeenchants.customenchants.CustomEnchants
+main: sp.yeyu.customeenchants.customenchants.EnchantPlus
 authors: [YeYu]
 description: Spigot Custom Enchants Plugin
 website: https://github.com/ye-yu/sp-custom-enchants

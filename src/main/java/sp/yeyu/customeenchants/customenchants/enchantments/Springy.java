@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
-import sp.yeyu.customeenchants.customenchants.CustomEnchants;
+import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 
 import java.util.Objects;
 
@@ -21,7 +21,7 @@ public class Springy extends EnchantWrapper implements Listener {
     public void applyEffect(Player player) {
         final ItemStack boots = player.getEquipment().getBoots();
         if (Objects.isNull(boots)) return;
-        final int level = boots.getEnchantmentLevel(CustomEnchants.EnchantEnum.SPRINGY_ENCHANTMENT.getEnchantment()) - 1;
+        final int level = boots.getEnchantmentLevel(EnchantPlus.EnchantEnum.SPRINGY_ENCHANTMENT.getEnchantment()) - 1;
         player.addPotionEffect(PotionEffectType.JUMP.createEffect(EnchantManager.calculateTotalEffectDuration(), level), true);
     }
 

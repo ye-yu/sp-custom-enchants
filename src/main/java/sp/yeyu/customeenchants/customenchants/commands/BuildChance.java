@@ -7,7 +7,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import sp.yeyu.customeenchants.customenchants.CustomEnchants;
+import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
 
 import java.util.Arrays;
@@ -24,7 +24,7 @@ public class BuildChance implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!devMode) {
-            sender.sendMessage("Development mode is off. Toggle dev mode as non-zero value in " + CustomEnchants.NAMESPACE + "/dev.txt");
+            sender.sendMessage("Development mode is off. Toggle dev mode as non-zero value in " + EnchantPlus.NAMESPACE + "/dev.txt");
             return true;
         }
 
@@ -40,7 +40,7 @@ public class BuildChance implements CommandExecutor {
             enchantmentName = StringUtils.join(Arrays.copyOfRange(args, 1, args.length), " ");
         }
 
-        final EnchantWrapper enchantment = CustomEnchants.getEnchantmentByDisplayName(enchantmentName);
+        final EnchantWrapper enchantment = EnchantPlus.getEnchantmentByDisplayName(enchantmentName);
         if (Objects.isNull(enchantment)) {
             sender.sendMessage("Cannot find enchantment of " + enchantmentName);
             return false;

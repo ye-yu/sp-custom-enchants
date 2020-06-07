@@ -5,7 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import sp.yeyu.customeenchants.customenchants.CustomEnchants;
+import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
 
 import java.util.Objects;
@@ -18,14 +18,14 @@ public class ShowChance implements CommandExecutor {
             return true;
         }
         final String enchantmentName = StringUtils.join(args, " ");
-        EnchantWrapper enchantment = CustomEnchants.getEnchantmentByDisplayName(enchantmentName);
+        EnchantWrapper enchantment = EnchantPlus.getEnchantmentByDisplayName(enchantmentName);
         if (Objects.isNull(enchantment)) {
             sender.sendMessage("Cannot find enchantment of " + enchantmentName);
             return false;
         }
 
         String enchantId = EnchantWrapper.getChanceVariableName(enchantment);
-        final double chance = CustomEnchants.CHANCE_DATA.getPlayerData((Player) sender).getDoubleOrDefault(enchantId, 0D);
+        final double chance = EnchantPlus.CHANCE_DATA.getPlayerData((Player) sender).getDoubleOrDefault(enchantId, 0D);
         sender.sendMessage(String.format("You have %.02f%% chance of getting %s from the enchantment table.", chance, enchantment.getName()));
         return true;
     }

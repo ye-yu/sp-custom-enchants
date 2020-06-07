@@ -23,12 +23,12 @@ import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
-public final class CustomEnchants extends JavaPlugin implements Listener {
+public final class EnchantPlus extends JavaPlugin implements Listener {
     public static final String NAMESPACE = "EnchantPlus";
     public static final String DEV_DATA_FILENAME = "dev.txt";
     public static final DataStorage CHANCE_DATA = new DataStorage(NAMESPACE);
-    public static final Logger LOGGER = LogManager.getLogger(CustomEnchants.class);
-    public static CustomEnchants ce;
+    public static final Logger LOGGER = LogManager.getLogger(EnchantPlus.class);
+    public static EnchantPlus ce;
 
     public static void registerEnchantment(Enchantment enchantment) {
         try {
