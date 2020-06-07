@@ -17,6 +17,7 @@ import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 import sp.yeyu.customeenchants.customenchants.utils.RomanNumeral;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -111,7 +112,7 @@ public class EnchantManager implements Listener {
         if (itemEvent.getEnchantsToAdd().size() > 4) return;
         int count = 0;
         final ItemStack item = itemEvent.getItem();
-        final Random random = new Random();
+        final Random random = new Random(Instant.now().toEpochMilli());
         for (EnchantPlus.EnchantEnum ench : EnchantPlus.EnchantEnum.values()) {
             final EnchantWrapper enchantment = ench.getEnchantment();
             if (enchantment.canEnchantItem(item)) {
