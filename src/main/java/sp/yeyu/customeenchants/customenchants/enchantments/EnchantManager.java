@@ -4,21 +4,24 @@ import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import sp.yeyu.customeenchants.customenchants.EnchantPlus;
-import sp.yeyu.customeenchants.customenchants.utils.RomanNumeral;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -98,6 +101,65 @@ public class EnchantManager implements Listener {
         return getEnchantManager().getRefreshRate() + getEnchantManager().getEffectDuration();
     }
 
+    /*
+     * Obtained from: https://bukkit.org/threads/inventory-anvil-events.142990/
+     * */
+    @EventHandler
+    public static void onInventoryClick(InventoryClickEvent e) {
+        // check whether the event has been cancelled by another plugin
+        if (e.isCancelled()) return;
+        HumanEntity ent = e.getWhoClicked();
+
+        // not really necessary
+        if (!(ent instanceof Player)) return;
+        Player player = (Player) ent;
+        Inventory inv = e.getInventory();
+
+        // see if we are talking about an anvil here
+        if (!(inv instanceof AnvilInventory)) return;
+
+        AnvilInventory anvil = (AnvilInventory)inv;
+        if (e.getRawSlot() < 3) {
+            LOGGER.info("Player is clicking from the anvil slots.");
+            LOGGER.info(e.getAction());
+            if (Arrays.asList(InventoryAction.PLACE_ALL, InventoryAction.PLACE_SOME, InventoryAction.PLACE_ONE).contains(e.getAction())) {
+                insertItemInAnvilThirdSlot(e, anvil);
+            }
+        } else {
+            LOGGER.info("Player is clicking from their inventory slots.");
+            LOGGER.info(e.getAction());
+            if (e.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
+                insertItemInAnvilThirdSlot(e, anvil);
+            }
+        }
+
+        if (e.getRawSlot() == 2) {
+            e.setResult(Event.Result.DENY);
+            player.sendMessage("Experience cost: X");
+        }
+    }
+
+    private static void insertItemInAnvilThirdSlot(InventoryClickEvent e, AnvilInventory anvil) {
+        if(Objects.nonNull(anvil.getItem(0)) || Objects.nonNull(anvil.getItem(2))) {
+            ItemStack leftItem;
+            ItemStack rightItem;
+            if (Objects.nonNull(anvil.getItem(0)) && Objects.nonNull(anvil.getItem(1))) {
+                LOGGER.info("Anvil slots are already occupied.");
+                leftItem = anvil.getItem(0);
+                rightItem = anvil.getItem(1);
+            } else {
+                if (Objects.isNull(anvil.getItem(0))) {
+                    leftItem = e.getCurrentItem();
+                    rightItem = anvil.getItem(1);
+                } else {
+                    leftItem = anvil.getItem(0);
+                    rightItem = e.getCurrentItem();
+                }
+            }
+            LOGGER.info(String.format("Anvil is now having %s in their left slot and %s in their right slot.", leftItem.getType(), rightItem.getType()));
+        }
+    }
+
     public int getEffectDuration() {
         return effectDuration;
     }
@@ -120,16 +182,7 @@ public class EnchantManager implements Listener {
                 final double roll = random.nextDouble() * 100 + 1;
                 if (chance > roll) {
                     int level = random.nextInt(enchantment.getMaxLevel()) + 1;
-                    ItemMeta meta = item.getItemMeta();
-                    ArrayList<String> lore = new ArrayList<>();
-
-                    if (enchantment.getMaxLevel() > 1)
-                        lore.add(String.format("%s%s %s", ChatColor.GRAY, enchantment.getName(), RomanNumeral.toRoman(level)));
-                    else
-                        lore.add(String.format("%s%s", ChatColor.GRAY, enchantment.getName()));
-                    meta.setLore(lore);
-                    item.setItemMeta(meta);
-                    item.addUnsafeEnchantment(enchantment, level);
+                    EnchantWrapper.enchantItem(item, level, enchantment);
                     EnchantWrapper.reduceEnchantmentChanceForPlayer(enchantment, itemEvent.getEnchanter(), chance * 0.2);
                     count++;
                 }

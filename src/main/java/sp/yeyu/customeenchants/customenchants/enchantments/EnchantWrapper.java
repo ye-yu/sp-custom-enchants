@@ -1,13 +1,17 @@
 package sp.yeyu.customeenchants.customenchants.enchantments;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 import sp.yeyu.customeenchants.customenchants.utils.RomanNumeral;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
+
+import java.util.ArrayList;
 
 public abstract class EnchantWrapper extends Enchantment {
 
@@ -34,6 +38,16 @@ public abstract class EnchantWrapper extends Enchantment {
         return newChance;
     }
 
+    public static void enchantItem(ItemStack item, int level, EnchantWrapper enchantment) {
+        ItemMeta meta = item.getItemMeta();
+        ArrayList<String> lore = new ArrayList<>();
+
+        lore.add(EnchantWrapper.getEnchantmentLoreName(enchantment, level));
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+        item.addUnsafeEnchantment(enchantment, level);
+    }
+
     public static double reduceEnchantmentChanceForPlayer(EnchantWrapper enchantment, Player player, double chance) {
         String enchantId = EnchantWrapper.getChanceVariableName(enchantment);
         final DataStorageInstance playerData = EnchantPlus.getChanceData().getPlayerData(player);
@@ -45,6 +59,14 @@ public abstract class EnchantWrapper extends Enchantment {
 
     public static boolean isBook(ItemStack item) {
         return item.getType() == Material.BOOK || item.getType() == Material.ENCHANTED_BOOK;
+    }
+
+    public static String getEnchantmentLoreName(Enchantment enchantment, int level) {
+        if (enchantment.getMaxLevel() > 1)
+            return (String.format("%s%s %s", ChatColor.GRAY, enchantment.getName(), RomanNumeral.toRoman(level)));
+        else
+            return (String.format("%s%s", ChatColor.GRAY, enchantment.getName()));
+
     }
 
     public String getDescription() {
