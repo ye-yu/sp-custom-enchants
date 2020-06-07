@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -17,6 +18,8 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.Repairable;
 import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
@@ -33,6 +36,7 @@ public class EnchantManager implements Listener {
 
     private static final Logger LOGGER = LogManager.getLogger(EnchantManager.class);
     private static final EnchantManager MANAGER = new EnchantManager(getRefreshRateFromData());
+    private static final HashMap<Player, List<ItemStack>> enchantSchedule = Maps.newHashMap();
     private final int refreshRate;
     private final int effectDuration;
 
@@ -119,45 +123,83 @@ public class EnchantManager implements Listener {
         if (!(inv instanceof AnvilInventory)) return;
 
         AnvilInventory anvil = (AnvilInventory)inv;
-        if (e.getRawSlot() < 3) {
+        if (e.getRawSlot() < 2) {
             LOGGER.info("Player is clicking from the anvil slots.");
             LOGGER.info(e.getAction());
             if (Arrays.asList(InventoryAction.PLACE_ALL, InventoryAction.PLACE_SOME, InventoryAction.PLACE_ONE).contains(e.getAction())) {
-                insertItemInAnvilThirdSlot(e, anvil);
+                insertItemInAnvilThirdSlot(e, anvil, player);
             }
         } else {
             LOGGER.info("Player is clicking from their inventory slots.");
             LOGGER.info(e.getAction());
             if (e.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
-                insertItemInAnvilThirdSlot(e, anvil);
+                insertItemInAnvilThirdSlot(e, anvil, player);
             }
         }
 
         if (e.getRawSlot() == 2) {
             e.setResult(Event.Result.DENY);
-            player.sendMessage("Experience cost: X");
+            if(Objects.isNull(anvil.getItem(0)) && Objects.isNull(anvil.getItem(1))) {
+                LOGGER.error("Anvil slots are not occupied");
+            }
+            if (enchantSchedule.containsKey(player)) {
+                final List<ItemStack> enchantSlots = enchantSchedule.remove(player);
+                ItemStack leftItem = enchantSlots.get(0);
+                ItemStack rightItem = enchantSlots.get(1);
+                if (Objects.nonNull(anvil.getItem(2))) {
+                    repairItem(leftItem, rightItem, anvil.getItem(2), anvil);
+                    LOGGER.info(String.format("Item in the first slot is being repaired: %s", anvil.getItem(2)));
+                } else if (rightItem.getType().equals(Material.ENCHANTED_BOOK)){
+                    enchantItemFromBook(leftItem, rightItem, anvil);
+                    LOGGER.info("Item is being enchanted.");
+                }
+            }
+            LOGGER.info(String.format("Current item in the slot: %s", Objects.isNull(anvil.getItem(2)) ? "EMPTY" : anvil.getItem(2)));
         }
     }
 
-    private static void insertItemInAnvilThirdSlot(InventoryClickEvent e, AnvilInventory anvil) {
-        if(Objects.nonNull(anvil.getItem(0)) || Objects.nonNull(anvil.getItem(2))) {
-            ItemStack leftItem;
-            ItemStack rightItem;
-            if (Objects.nonNull(anvil.getItem(0)) && Objects.nonNull(anvil.getItem(1))) {
-                LOGGER.info("Anvil slots are already occupied.");
-                leftItem = anvil.getItem(0);
+    private static void enchantItemFromBook(ItemStack leftItem, ItemStack rightItem, AnvilInventory anvil) {
+        final ItemStack itemStack = new ItemStack(leftItem);
+        final ItemMeta meta = itemStack.getItemMeta();
+        meta.setDisplayName("Enchanted item");
+        meta.setLore(Arrays.asList("Actual cost: X"));
+        itemStack.setItemMeta(meta);
+        itemStack.addEnchantment(EnchantPlus.EnchantEnum.ANVIL_TAG.getEnchantment(), 1);
+        anvil.setItem(2, itemStack);
+    }
+
+    private static void repairItem(ItemStack leftItem, ItemStack rightItem, ItemStack resultingItem, AnvilInventory anvil) {
+        final ItemStack itemStack = new ItemStack(leftItem);
+        final ItemMeta meta = itemStack.getItemMeta();
+        meta.setDisplayName("Repaired item");
+        meta.setLore(Arrays.asList("Actual cost: X"));
+        itemStack.setItemMeta(meta);
+        itemStack.addEnchantment(EnchantPlus.EnchantEnum.ANVIL_TAG.getEnchantment(), 1);
+        anvil.setItem(2, itemStack);
+    }
+
+    private static void insertItemInAnvilThirdSlot(InventoryClickEvent e, AnvilInventory anvil, Player player) {
+        if(Objects.isNull(anvil.getItem(0)) && Objects.isNull(anvil.getItem(1))) {
+            enchantSchedule.remove(player);
+            return;
+        }
+        ItemStack leftItem;
+        ItemStack rightItem;
+        if (Objects.nonNull(anvil.getItem(0)) && Objects.nonNull(anvil.getItem(1))) {
+            LOGGER.info("Anvil slots are already occupied.");
+            leftItem = anvil.getItem(0);
+            rightItem = anvil.getItem(1);
+        } else {
+            if (Objects.isNull(anvil.getItem(0))) {
+                leftItem = e.getCurrentItem();
                 rightItem = anvil.getItem(1);
             } else {
-                if (Objects.isNull(anvil.getItem(0))) {
-                    leftItem = e.getCurrentItem();
-                    rightItem = anvil.getItem(1);
-                } else {
-                    leftItem = anvil.getItem(0);
-                    rightItem = e.getCurrentItem();
-                }
+                leftItem = anvil.getItem(0);
+                rightItem = e.getCurrentItem();
             }
-            LOGGER.info(String.format("Anvil is now having %s in their left slot and %s in their right slot.", leftItem.getType(), rightItem.getType()));
         }
+        LOGGER.info(String.format("Anvil is now having %s in their left slot and %s in their right slot.", leftItem.getType(), rightItem.getType()));
+        enchantSchedule.put(player, Arrays.asList(leftItem, rightItem));
     }
 
     public int getEffectDuration() {
