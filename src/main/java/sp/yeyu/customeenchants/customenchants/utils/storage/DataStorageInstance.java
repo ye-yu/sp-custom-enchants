@@ -17,6 +17,7 @@ public class DataStorageInstance {
     private static final Logger LOGGER = LogManager.getLogger(DataStorageInstance.class);
     public final String FILENAME;
     public final String DIRECTORY;
+
     public final String SEPARATOR = ":";
     private final HashMap<String, String> data = Maps.newHashMap();
 
