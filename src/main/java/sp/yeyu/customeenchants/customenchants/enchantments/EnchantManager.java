@@ -146,6 +146,7 @@ public class EnchantManager implements Listener {
             } else if (rightItem.getType().equals(Material.ENCHANTED_BOOK)) {
                 final ItemStack enchantedItem = scheduleEnchantItemFromBook(leftItem, rightItem);
                 anvil.setItem(2, enchantedItem);
+                enchantSlots.add(2, enchantedItem);
                 LOGGER.info("Item is being enchanted.");
             }
         } else if (enchantSlots.size() > 2) {
@@ -170,15 +171,16 @@ public class EnchantManager implements Listener {
                 anvil.setItem(0, new ItemStack(Material.AIR));
                 anvil.setItem(1, new ItemStack(Material.AIR));
                 anvil.setItem(2, new ItemStack(Material.AIR));
+                enchantSchedule.remove(player);
                 player.setItemOnCursor(resultingItem);
                 player.closeInventory();
             }
         }
-
         e.setResult(Event.Result.DENY);
     }
 
     private static void whenClickingAnvilSlot(InventoryClickEvent e, AnvilInventory anvil, Player player) {
+        enchantSchedule.remove(player); // always reset when user perform inventory change
         if (e.getRawSlot() < 2) {
             LOGGER.info("Player is clicking from the anvil slots.");
             if (Arrays.asList(InventoryAction.PLACE_ALL, InventoryAction.PLACE_SOME, InventoryAction.PLACE_ONE).contains(e.getAction())) {
@@ -221,8 +223,11 @@ public class EnchantManager implements Listener {
         final ItemStack itemStack = new ItemStack(leftItem);
         final ItemMeta meta = itemStack.getItemMeta();
         EnchantWrapper.enchantItem(itemStack, 1, EnchantPlus.EnchantEnum.ANVIL_TAG.getEnchantment());
+        ArrayList<String> lores = Lists.newArrayList();
+        lores.add(meta.hasDisplayName() ? meta.getDisplayName() : itemStack.getType().toString());
+        lores.add("Actual cost: X");
+        meta.setLore(lores);
         meta.setDisplayName("Enchanted item");
-        meta.setLore(Arrays.asList("Actual cost: X"));
         itemStack.setItemMeta(meta);
         return itemStack;
     }
@@ -231,8 +236,11 @@ public class EnchantManager implements Listener {
         final ItemStack itemStack = new ItemStack(leftItem);
         final ItemMeta meta = itemStack.getItemMeta();
         EnchantWrapper.enchantItem(itemStack, 1, EnchantPlus.EnchantEnum.ANVIL_TAG.getEnchantment());
+        ArrayList<String> lores = Lists.newArrayList();
+        lores.add(meta.hasDisplayName() ? meta.getDisplayName() : itemStack.getType().toString());
+        lores.add("Actual cost: X");
+        meta.setLore(lores);
         meta.setDisplayName("Repaired item");
-        meta.setLore(Arrays.asList("Actual cost: X"));
         itemStack.setItemMeta(meta);
         return itemStack;
     }
