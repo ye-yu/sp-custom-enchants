@@ -42,6 +42,6 @@ public class Anvil extends EnchantWrapper {
 
     @Override
     public boolean canEnchantItem(ItemStack item) {
-        return false;
+        return true;
     }
 }
