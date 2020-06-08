@@ -3,6 +3,7 @@ package sp.yeyu.customeenchants.customenchants.enchantments;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -17,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
@@ -179,7 +181,7 @@ public class EnchantManager implements Listener {
                 anvil.setItem(2, new ItemStack(Material.AIR));
                 enchantSchedule.remove(player);
                 player.setItemOnCursor(resultingItem);
-                player.closeInventory();
+                player.updateInventory();
             }
         }
     }
@@ -245,6 +247,7 @@ public class EnchantManager implements Listener {
         itemStack.setItemMeta(meta);
         return itemStack;
     }
+
     private static void insertItemInAnvilThirdSlot(ItemStack leftItem, ItemStack rightItem, int rawSlot, Player player) {
         if (Objects.isNull(leftItem) && Objects.isNull(rightItem)) return;
         if (!pickUpSchedule.containsKey(player)) return;
@@ -261,7 +264,7 @@ public class EnchantManager implements Listener {
 
     public static String getName(ItemStack itemStack) {
         final String[] split = itemStack.getType().name().toLowerCase().split("_");
-        return Stream.of(split).map(StringUtils::capitalize).collect(Collectors.joining(" "));
+        return WordUtils.capitalize(StringUtils.join(split, " "));
     }
 
     private static void insertItemInAnvilThirdSlotFromShiftClick(InventoryClickEvent e, AnvilInventory anvil, Player player) {
