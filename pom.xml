@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>sp.yeyu.customeenchants</groupId>
-    <artifactId>custom-enchants</artifactId>
-    <version>0.1.1</version>
+    <artifactId>enchant-plus</artifactId>
+    <version>0.2-snapshot1</version>
     <packaging>jar</packaging>
 
     <name>Custom Enchants</name>
