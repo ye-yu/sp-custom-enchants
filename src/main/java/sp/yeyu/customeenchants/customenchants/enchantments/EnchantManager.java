@@ -2,9 +2,11 @@ package sp.yeyu.customeenchants.customenchants.enchantments;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
@@ -223,8 +225,8 @@ public class EnchantManager implements Listener {
         final ItemMeta meta = itemStack.getItemMeta();
         EnchantWrapper.enchantItem(itemStack, 1, EnchantPlus.EnchantEnum.ANVIL_TAG.getEnchantment());
         ArrayList<String> lores = Lists.newArrayList();
-        lores.add(meta.hasDisplayName() ? meta.getDisplayName() : itemStack.getType().toString());
-        lores.add("Actual cost: X");
+        lores.add(ChatColor.GRAY + (meta.hasDisplayName() ? meta.getDisplayName() : getName(itemStack)));
+        lores.add(ChatColor.YELLOW + "Actual cost: X");
         meta.setLore(lores);
         meta.setDisplayName("Enchanted item");
         itemStack.setItemMeta(meta);
@@ -236,8 +238,8 @@ public class EnchantManager implements Listener {
         final ItemMeta meta = itemStack.getItemMeta();
         EnchantWrapper.enchantItem(itemStack, 1, EnchantPlus.EnchantEnum.ANVIL_TAG.getEnchantment());
         ArrayList<String> lores = Lists.newArrayList();
-        lores.add(meta.hasDisplayName() ? meta.getDisplayName() : itemStack.getType().toString());
-        lores.add("Actual cost: X");
+        lores.add(ChatColor.GRAY + (meta.hasDisplayName() ? meta.getDisplayName() : getName(itemStack)));
+        lores.add(ChatColor.YELLOW + "Actual cost: X");
         meta.setLore(lores);
         meta.setDisplayName("Repaired item");
         itemStack.setItemMeta(meta);
@@ -256,6 +258,12 @@ public class EnchantManager implements Listener {
         }
         LOGGER.info(String.format("Anvil actually has %s in the left slot and %s in the right slot.", leftItem, rightItem));
     }
+
+    public static String getName(ItemStack itemStack) {
+        final String[] split = itemStack.getType().name().toLowerCase().split("_");
+        return Stream.of(split).map(StringUtils::capitalize).collect(Collectors.joining(" "));
+    }
+
     private static void insertItemInAnvilThirdSlotFromShiftClick(InventoryClickEvent e, AnvilInventory anvil, Player player) {
         if (Objects.isNull(anvil.getItem(0)) && Objects.isNull(anvil.getItem(1))) {
             enchantSchedule.remove(player);
