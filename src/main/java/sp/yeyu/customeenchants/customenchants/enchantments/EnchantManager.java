@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -175,6 +176,7 @@ public class EnchantManager implements Listener {
                 final ItemStack repairItem = enchantSlots.get(2);
                 int cost = getCostFromMetaBook(enchantSlots.get(2));
                 if (player.getLevel() >= cost) {
+                    player.setLevel(player.getLevel() - cost);
                     resultingItem = repairItemFromAnvil(item, repairItem);
                 }
                 hasFinishedRepaired = true;
@@ -185,6 +187,7 @@ public class EnchantManager implements Listener {
                 anvil.setItem(1, new ItemStack(Material.AIR));
                 anvil.setItem(2, new ItemStack(Material.AIR));
                 enchantSchedule.remove(player);
+                player.playSound(player.getLocation(), Sound.ANVIL_USE, 1, 1);
                 player.setItemOnCursor(resultingItem);
                 player.updateInventory();
             }
@@ -240,7 +243,11 @@ public class EnchantManager implements Listener {
     private static ItemStack repairItemFromAnvil(ItemStack targetItem, ItemStack repairItem) {
         ItemStack newItem = new ItemStack(repairItem);
         final ItemMeta itemMeta = newItem.getItemMeta();
-        itemMeta.setDisplayName("Repaired");
+        ArrayList<String> lores = Lists.newArrayList();
+        for (Enchantment enchantment : repairItem.getEnchantments().keySet()) {
+            lores.add(EnchantWrapper.getEnchantmentLoreName(enchantment, repairItem.getEnchantmentLevel(enchantment)));
+        }
+        itemMeta.setLore(lores);
         newItem.setItemMeta(itemMeta);
         return newItem;
     }
@@ -288,7 +295,7 @@ public class EnchantManager implements Listener {
     }
 
     private static ItemStack scheduleRepairItem(ItemStack leftItem, ItemStack rightItem, ItemStack resultingItem) {
-        final ItemStack itemStack = new ItemStack(leftItem);
+        final ItemStack itemStack = new ItemStack(leftItem.getType());
         final ItemMeta meta = itemStack.getItemMeta();
 
         // log enchant list
