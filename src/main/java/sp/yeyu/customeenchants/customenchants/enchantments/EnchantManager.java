@@ -262,9 +262,6 @@ public class EnchantManager implements Listener {
         // add enchantment tag to the meta item to be appear in the third slot
         EnchantWrapper.enchantItem(itemStack, 1, EnchantPlus.EnchantEnum.ANVIL_TAG.getEnchantment());
 
-        // calculate repair cost
-        int cost = getCustomEnchantmentCost(rightItem) + getCustomEnchantmentCost(itemStack);
-
         // add lore
         ArrayList<String> lores = Lists.newArrayList();
 
@@ -275,8 +272,8 @@ public class EnchantManager implements Listener {
             }
         }
 
-        // add item name to the lore
-        lores.add(ChatColor.AQUA + (meta.hasDisplayName() ? meta.getDisplayName() : getName(itemStack)));
+        // calculate repair cost
+        int cost = getCustomEnchantmentCost(itemStack);
 
         // add enchantment lore
         for (Enchantment enchantment : itemStack.getEnchantments().keySet()) {
@@ -285,8 +282,8 @@ public class EnchantManager implements Listener {
 
         // add actual enchantment cost
         lores.add(ChatColor.YELLOW + ACTUAL_COST_PREFIX + cost);
+        meta.setDisplayName(ChatColor.AQUA + (meta.hasDisplayName() ? (ChatColor.ITALIC + meta.getDisplayName()) : getName(itemStack)));
         meta.setLore(lores);
-        meta.setDisplayName(ChatColor.GOLD + "Resulting Item");
         itemStack.setItemMeta(meta);
         return itemStack;
     }
@@ -308,17 +305,11 @@ public class EnchantManager implements Listener {
         // add enchantment tag to the meta item to be appear in the third slot
         EnchantWrapper.enchantItem(itemStack, 1, EnchantPlus.EnchantEnum.ANVIL_TAG.getEnchantment());
 
-        // calculate repair cost
-        int cost = getRepairCost(resultingItem) + getCustomEnchantmentCost(leftItem) + getCustomEnchantmentCost(rightItem);
-
         // get custom enchantments
         HashMap<EnchantWrapper, Integer> customEnchantments = mergeCustomEnchantments(leftItem, rightItem);
 
         // prepare lore
         ArrayList<String> lores = Lists.newArrayList();
-
-        // write item name to lore
-        lores.add(ChatColor.AQUA + (meta.hasDisplayName() ? meta.getDisplayName() : getName(itemStack)));
 
         // re-add vanilla enchantment lore
         for (Enchantment enchantment : resultingItem.getEnchantments().keySet()) {
@@ -331,10 +322,13 @@ public class EnchantManager implements Listener {
             resultingItem.addUnsafeEnchantment(customEnch, customEnchantments.get(customEnch));
         }
 
+        // calculate repair cost
+        int cost = getRepairCost(resultingItem) + getCustomEnchantmentCost(resultingItem);
+
         // put in the actual cost in the lore
         lores.add(ChatColor.YELLOW + ACTUAL_COST_PREFIX + cost);
+        meta.setDisplayName(ChatColor.AQUA + (meta.hasDisplayName() ? (ChatColor.ITALIC + meta.getDisplayName()) : getName(itemStack)));
         meta.setLore(lores);
-        meta.setDisplayName(ChatColor.YELLOW + "Resulting Item");
         itemStack.setItemMeta(meta);
         return itemStack;
     }
@@ -365,9 +359,7 @@ public class EnchantManager implements Listener {
             customEnchants.put(customEnch, itemStack.getEnchantmentLevel(customEnch));
         }
         return customEnchants;
-
     }
-
 
     private static void insertItemInAnvilThirdSlot(ItemStack leftItem, ItemStack rightItem, int rawSlot, Player player) {
         if (Objects.isNull(leftItem) && Objects.isNull(rightItem)) return;
