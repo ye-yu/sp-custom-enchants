@@ -13,6 +13,8 @@ import sp.yeyu.customeenchants.customenchants.utils.RomanNumeral;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public abstract class EnchantWrapper extends Enchantment {
 
@@ -64,16 +66,16 @@ public abstract class EnchantWrapper extends Enchantment {
 
     public static String getEnchantmentLoreName(Enchantment enchantment, int level) {
         if (enchantment.getMaxLevel() > 1)
-            return (String.format("%s%s %s", ChatColor.GRAY, enchantment.getName(), RomanNumeral.toRoman(level)));
+            return (String.format("%s%s %s", ChatColor.GRAY, convertToDisplayName(enchantment), RomanNumeral.toRoman(level)));
         else
-            return (String.format("%s%s", ChatColor.GRAY, enchantment.getName()));
+            return (String.format("%s%s", ChatColor.GRAY, convertToDisplayName(enchantment)));
 
     }
 
     public String getDescription() {
         if (getMaxLevel() > 1)
-            return String.format("%s [I-%s] - %s", getName(), RomanNumeral.toRoman(getMaxLevel()), description);
-        return String.format("%s - %s", getName(), description);
+            return String.format("%d: %s [I-%s] - %s", this.registeredId, convertToDisplayName(this), RomanNumeral.toRoman(getMaxLevel()), description);
+        return String.format("%d: %s - %s", this.registeredId, getName(), description);
     }
 
     public int getRegisteredId() {
@@ -82,12 +84,17 @@ public abstract class EnchantWrapper extends Enchantment {
 
     @Override
     public String getName() {
-        return StringUtils.capitalize(name);
+        return name.toUpperCase().replace(" ", "_");
     }
 
     public String getVariableName() {
         return WordUtils.capitalize(name).replace(" ", "");
     }
+
+    public static String convertToDisplayName(Enchantment ench) {
+        return WordUtils.capitalize(String.join(" ", ench.getName().toLowerCase().split("_")));
+    }
+
 
     public abstract void applyEffect(Player player);
 
