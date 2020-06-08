@@ -14,6 +14,7 @@ import sp.yeyu.customeenchants.customenchants.commands.BuildChance;
 import sp.yeyu.customeenchants.customenchants.commands.Enchants;
 import sp.yeyu.customeenchants.customenchants.commands.ShowChance;
 import sp.yeyu.customeenchants.customenchants.enchantments.Anvil;
+import sp.yeyu.customeenchants.customenchants.enchantments.AnvilManager;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantManager;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
 import sp.yeyu.customeenchants.customenchants.enchantments.Focus;
@@ -66,6 +67,7 @@ public final class EnchantPlus extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents((Listener) EnchantEnum.FOCUS_ENCHANTMENT.getEnchantment(), this);
         getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(new AnvilManager(), this);
         getServer().getPluginManager().registerEvents(EnchantManager.getEnchantManager(), this);
 
 

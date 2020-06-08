@@ -2,6 +2,8 @@ package sp.yeyu.customeenchants.customenchants.enchantments;
 
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.WordUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -21,6 +23,7 @@ public abstract class EnchantWrapper extends Enchantment {
     final int registeredId;
     protected String description;
     public static final HashMap<String, String> vanillaEnchDisplayName = Maps.newHashMap();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     static {
         vanillaEnchDisplayName.put("ARROW_DAMAGE","Power");
@@ -76,11 +79,22 @@ public abstract class EnchantWrapper extends Enchantment {
 
     public static void enchantItem(ItemStack item, int level, Enchantment enchantment) {
         ItemMeta meta = item.getItemMeta();
-        ArrayList<String> lore = new ArrayList<>();
+        ArrayList<String> lore;
+        if (!meta.hasLore())
+            lore = new ArrayList<>();
+        else
+            lore = (ArrayList<String>) meta.getLore();
 
         lore.add(EnchantWrapper.getEnchantmentLoreName(enchantment, level));
         meta.setLore(lore);
         item.setItemMeta(meta);
+        if (enchantment instanceof EnchantWrapper)
+            item.addUnsafeEnchantment(enchantment, level);
+        else
+            item.addEnchantment(enchantment, level);
+    }
+
+    public static void enchantItemWithoutLore(ItemStack item, int level, Enchantment enchantment) {
         if (enchantment instanceof EnchantWrapper)
             item.addUnsafeEnchantment(enchantment, level);
         else
