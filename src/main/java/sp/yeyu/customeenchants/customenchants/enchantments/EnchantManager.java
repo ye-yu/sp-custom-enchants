@@ -203,15 +203,18 @@ public class EnchantManager implements Listener {
     private static int getCustomEnchantmentCost(ItemStack item) {
         int cost = 0;
         for (Enchantment ench: item.getEnchantments().keySet()) {
-            cost += item.getEnchantmentLevel(ench);
+            if (ench instanceof EnchantWrapper)
+                cost += item.getEnchantmentLevel(ench);
         }
+        LOGGER.info(String.format("%s has the additional repair cost of %d", item.getType(), cost));
         return cost;
     }
 
     private static int getRepairCost(ItemStack repairItem) {
-        if (!(repairItem.getItemMeta() instanceof Repairable)) return 0;
+        if (!(repairItem.getItemMeta() instanceof Repairable)) return 1;
         final Repairable itemMeta = (Repairable) repairItem.getItemMeta();
-        return itemMeta.getRepairCost() + 1;
+        LOGGER.info(String.format("%s has the vanilla repair cost of %d", repairItem.getType(), itemMeta.getRepairCost()));
+        return itemMeta.getRepairCost();
     }
 
     private static void whenClickingAnvilSlot(InventoryClickEvent e, AnvilInventory anvil, Player player) {
@@ -318,14 +321,17 @@ public class EnchantManager implements Listener {
         }
 
         // calculate repair cost
-        int cost = getRepairCost(resultingItem) + getCustomEnchantmentCost(resultingItem);
+        int cost = getRepairCost(resultingItem) + getCustomEnchantmentCost(resultingItem) + 1;
 
         // put in the actual cost in the lore
         lores.add(ChatColor.YELLOW + ACTUAL_COST_PREFIX + cost);
         meta.setDisplayName(ChatColor.AQUA + (meta.hasDisplayName() ? (ChatColor.ITALIC + meta.getDisplayName()) : getName(itemStack)));
         meta.setLore(null);
         meta.setLore(lores);
-        itemStack.setItemMeta(meta);
+
+        Repairable repairable = (Repairable)meta;
+        repairable.setRepairCost(cost);
+        itemStack.setItemMeta((ItemMeta) repairable);
         return itemStack;
     }
 
