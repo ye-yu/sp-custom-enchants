@@ -18,12 +18,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.Repairable;
 import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -43,6 +44,7 @@ public class EnchantManager implements Listener {
     private static final EnchantManager MANAGER = new EnchantManager(getRefreshRateFromData());
     private static final HashMap<Player, ArrayList<ItemStack>> enchantSchedule = Maps.newHashMap();
     private static final HashMap<Player, ItemStack> pickUpSchedule = Maps.newHashMap();
+    private static final String ACTUAL_COST_PREFIX = "Actual cost: ";
 
     private final int refreshRate;
     private final int effectDuration;
@@ -171,7 +173,10 @@ public class EnchantManager implements Listener {
             } else if (enchantSlots.size() == 4) {
                 // return repaired item
                 final ItemStack repairItem = enchantSlots.get(2);
-                resultingItem = repairItemFromAnvil(item, repairItem);
+                int cost = getCostFromMetaBook(enchantSlots.get(2));
+                if (player.getLevel() >= cost) {
+                    resultingItem = repairItemFromAnvil(item, repairItem);
+                }
                 hasFinishedRepaired = true;
             }
 
@@ -184,6 +189,33 @@ public class EnchantManager implements Listener {
                 player.updateInventory();
             }
         }
+    }
+
+    private static int getCostFromMetaBook(ItemStack itemStack) {
+        int cost = 0;
+        final ItemMeta itemMeta = itemStack.getItemMeta();
+        final List<String> lore = itemMeta.getLore();
+        final String s = lore.get(lore.size() - 1);
+        cost += Integer.parseInt(s.substring(ACTUAL_COST_PREFIX.length()));
+        return cost;
+    }
+
+    private static int getCustomEnchantmentCost(ItemStack item) {
+        int cost = 0;
+        final int PER_ENCH_COST = 5;
+        for (Enchantment ench: item.getEnchantments().keySet()) {
+            if (ench instanceof EnchantWrapper) {
+                int perLevelCost = (int)Math.ceil((double)PER_ENCH_COST / ench.getMaxLevel());
+                cost += perLevelCost * item.getEnchantmentLevel(ench);
+            }
+        }
+        return cost;
+    }
+
+    private static int getRepairCost(ItemStack repairItem) {
+        if (!(repairItem.getItemMeta() instanceof Repairable)) return 0;
+        final Repairable itemMeta = (Repairable) repairItem.getItemMeta();
+        return itemMeta.getRepairCost();
     }
 
     private static void whenClickingAnvilSlot(InventoryClickEvent e, AnvilInventory anvil, Player player) {
@@ -207,7 +239,7 @@ public class EnchantManager implements Listener {
     }
 
     private static ItemStack repairItemFromAnvil(ItemStack targetItem, ItemStack repairItem) {
-        ItemStack newItem = new ItemStack(targetItem);
+        ItemStack newItem = new ItemStack(repairItem);
         final ItemMeta itemMeta = newItem.getItemMeta();
         itemMeta.setDisplayName("Repaired");
         newItem.setItemMeta(itemMeta);
@@ -223,14 +255,38 @@ public class EnchantManager implements Listener {
     }
 
     private static ItemStack scheduleEnchantItemFromBook(ItemStack leftItem, ItemStack rightItem) {
+        // method is invoked only when the enchantment book only contains custom enchants
         final ItemStack itemStack = new ItemStack(leftItem);
         final ItemMeta meta = itemStack.getItemMeta();
+
+        // add enchantment tag to the meta item to be appear in the third slot
         EnchantWrapper.enchantItem(itemStack, 1, EnchantPlus.EnchantEnum.ANVIL_TAG.getEnchantment());
+
+        // calculate repair cost
+        int cost = getCustomEnchantmentCost(rightItem) + getCustomEnchantmentCost(itemStack);
+
+        // add lore
         ArrayList<String> lores = Lists.newArrayList();
-        lores.add(ChatColor.GRAY + (meta.hasDisplayName() ? meta.getDisplayName() : getName(itemStack)));
-        lores.add(ChatColor.YELLOW + "Actual cost: X");
+
+        // merge enchantment
+        for (Enchantment enchantment : rightItem.getEnchantments().keySet()) {
+            if (itemStack.getEnchantments().keySet().stream().noneMatch(e -> e.conflictsWith(enchantment))) {
+                itemStack.addUnsafeEnchantment(enchantment, rightItem.getEnchantmentLevel(enchantment));
+            }
+        }
+
+        // add item name to the lore
+        lores.add(ChatColor.AQUA + (meta.hasDisplayName() ? meta.getDisplayName() : getName(itemStack)));
+
+        // add enchantment lore
+        for (Enchantment enchantment : itemStack.getEnchantments().keySet()) {
+            lores.add(ChatColor.GRAY + EnchantWrapper.getEnchantmentLoreName(enchantment, itemStack.getEnchantmentLevel(enchantment)));
+        }
+
+        // add actual enchantment cost
+        lores.add(ChatColor.YELLOW + ACTUAL_COST_PREFIX + cost);
         meta.setLore(lores);
-        meta.setDisplayName("Enchanted item");
+        meta.setDisplayName(ChatColor.GOLD + "Resulting Item");
         itemStack.setItemMeta(meta);
         return itemStack;
     }
@@ -238,15 +294,80 @@ public class EnchantManager implements Listener {
     private static ItemStack scheduleRepairItem(ItemStack leftItem, ItemStack rightItem, ItemStack resultingItem) {
         final ItemStack itemStack = new ItemStack(leftItem);
         final ItemMeta meta = itemStack.getItemMeta();
+
+        // log enchant list
+        for (Enchantment ench : leftItem.getEnchantments().keySet()) {
+            LOGGER.info("Left item has the enchantment: " + ench.getName());
+        }
+
+        for (Enchantment ench : rightItem.getEnchantments().keySet()) {
+            LOGGER.info("right item has the enchantment: " + ench.getName());
+        }
+
+
+        // add enchantment tag to the meta item to be appear in the third slot
         EnchantWrapper.enchantItem(itemStack, 1, EnchantPlus.EnchantEnum.ANVIL_TAG.getEnchantment());
+
+        // calculate repair cost
+        int cost = getRepairCost(resultingItem) + getCustomEnchantmentCost(leftItem) + getCustomEnchantmentCost(rightItem);
+
+        // get custom enchantments
+        HashMap<EnchantWrapper, Integer> customEnchantments = mergeCustomEnchantments(leftItem, rightItem);
+
+        // prepare lore
         ArrayList<String> lores = Lists.newArrayList();
-        lores.add(ChatColor.GRAY + (meta.hasDisplayName() ? meta.getDisplayName() : getName(itemStack)));
-        lores.add(ChatColor.YELLOW + "Actual cost: X");
+
+        // write item name to lore
+        lores.add(ChatColor.AQUA + (meta.hasDisplayName() ? meta.getDisplayName() : getName(itemStack)));
+
+        // re-add vanilla enchantment lore
+        for (Enchantment enchantment : resultingItem.getEnchantments().keySet()) {
+            lores.add(ChatColor.GRAY + EnchantWrapper.getEnchantmentLoreName(enchantment, resultingItem.getEnchantmentLevel(enchantment)));
+        }
+
+        // add custom enchantment lore
+        for (EnchantWrapper customEnch : customEnchantments.keySet()) {
+            lores.add(ChatColor.GRAY + EnchantWrapper.getEnchantmentLoreName(customEnch, customEnchantments.get(customEnch)));
+            resultingItem.addUnsafeEnchantment(customEnch, customEnchantments.get(customEnch));
+        }
+
+        // put in the actual cost in the lore
+        lores.add(ChatColor.YELLOW + ACTUAL_COST_PREFIX + cost);
         meta.setLore(lores);
-        meta.setDisplayName("Repaired item");
+        meta.setDisplayName(ChatColor.YELLOW + "Resulting Item");
         itemStack.setItemMeta(meta);
         return itemStack;
     }
+
+    private static HashMap<EnchantWrapper, Integer> mergeCustomEnchantments(ItemStack leftItem, ItemStack rightItem) {
+        final HashMap<EnchantWrapper, Integer> leftEnchantments = getCustomEnchants(leftItem);
+        final HashMap<EnchantWrapper, Integer> rightEnchantments = getCustomEnchants(rightItem);
+        for (EnchantWrapper rightEnch : rightEnchantments.keySet()) {
+            if (leftEnchantments.containsKey(rightEnch)) {
+                if (leftEnchantments.get(rightEnch).equals(rightEnchantments.get(rightEnch))) {
+                    leftEnchantments.put(
+                            rightEnch,
+                            rightEnchantments.get(rightEnch) >= rightEnch.getMaxLevel() ? rightEnch.getMaxLevel() : rightEnchantments.get(rightEnch) + 1);
+                } else if (leftEnchantments.keySet().stream().noneMatch(e -> e.conflictsWith(rightEnch))) { // only all nonc conflicting enchants
+                    leftEnchantments.put(rightEnch, rightEnchantments.get(rightEnch));
+                }
+            } else {
+                leftEnchantments.put(rightEnch, rightEnchantments.get(rightEnch));
+            }
+        }
+        return leftEnchantments;
+    }
+
+    private static HashMap<EnchantWrapper, Integer> getCustomEnchants(ItemStack itemStack) {
+        final List<EnchantWrapper> collect = itemStack.getEnchantments().keySet().stream().filter(e -> e instanceof EnchantWrapper).map(e -> (EnchantWrapper) e).collect(Collectors.toList());
+        final HashMap<EnchantWrapper, Integer> customEnchants = Maps.newHashMap();
+        for (EnchantWrapper customEnch : collect) {
+            customEnchants.put(customEnch, itemStack.getEnchantmentLevel(customEnch));
+        }
+        return customEnchants;
+
+    }
+
 
     private static void insertItemInAnvilThirdSlot(ItemStack leftItem, ItemStack rightItem, int rawSlot, Player player) {
         if (Objects.isNull(leftItem) && Objects.isNull(rightItem)) return;
