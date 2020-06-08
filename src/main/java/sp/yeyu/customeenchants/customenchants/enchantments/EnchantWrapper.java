@@ -74,14 +74,17 @@ public abstract class EnchantWrapper extends Enchantment {
         return newChance;
     }
 
-    public static void enchantItem(ItemStack item, int level, EnchantWrapper enchantment) {
+    public static void enchantItem(ItemStack item, int level, Enchantment enchantment) {
         ItemMeta meta = item.getItemMeta();
         ArrayList<String> lore = new ArrayList<>();
 
         lore.add(EnchantWrapper.getEnchantmentLoreName(enchantment, level));
         meta.setLore(lore);
         item.setItemMeta(meta);
-        item.addUnsafeEnchantment(enchantment, level);
+        if (enchantment instanceof EnchantWrapper)
+            item.addUnsafeEnchantment(enchantment, level);
+        else
+            item.addEnchantment(enchantment, level);
     }
 
     public static double reduceEnchantmentChanceForPlayer(EnchantWrapper enchantment, Player player, double chance) {
