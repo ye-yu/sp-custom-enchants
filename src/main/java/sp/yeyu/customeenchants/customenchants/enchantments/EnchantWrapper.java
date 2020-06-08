@@ -1,6 +1,7 @@
 package sp.yeyu.customeenchants.customenchants.enchantments;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -85,7 +86,7 @@ public abstract class EnchantWrapper extends Enchantment {
     }
 
     public String getVariableName() {
-        return StringUtils.capitalize(name).replace(" ", "");
+        return WordUtils.capitalize(name).replace(" ", "");
     }
 
     public abstract void applyEffect(Player player);
