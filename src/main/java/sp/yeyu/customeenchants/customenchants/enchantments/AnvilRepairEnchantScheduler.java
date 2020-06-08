@@ -35,6 +35,10 @@ public class AnvilRepairEnchantScheduler {
         this.secondSlot = secondSlot;
     }
 
+    public boolean hasEnchantments() {
+        return !enchantments.isEmpty();
+    }
+
     public static AnvilRepairEnchantScheduler getScheduleData(Player player) {
         return schedule.get(player);
     }

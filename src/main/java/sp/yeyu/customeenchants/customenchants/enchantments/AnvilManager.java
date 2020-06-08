@@ -73,27 +73,23 @@ public class AnvilManager implements Listener {
                 scheduleData.setHasDisplayedItem(true);
             } else if (rightItem.getType().equals(Material.ENCHANTED_BOOK)) {
                 // todo: handle event when enchanting from incompatible book
-                final ItemStack enchantedItem = scheduleEnchantItemFromBook(leftItem, rightItem);
-                anvil.setItem(2, enchantedItem);
-                LOGGER.info("Item is being enchanted.");
+                final ItemStack enchantedItem = scheduleEnchantItemFromBook(scheduleData, leftItem, rightItem);
+                if (Objects.nonNull(enchantedItem)) {
+                    anvil.setItem(2, enchantedItem);
+                    scheduleData.setRepair(false);
+                    scheduleData.setHasDisplayedItem(true);
+                    LOGGER.info("Item is being enchanted.");
+                }
             }
             
             LOGGER.info("Resulting item lore:\n" + StringUtils.join(anvil.getItem(2).getItemMeta().getLore(), "\n"));
         } else {
             // prepare to return item
-            boolean hasFinishedRepaired = false;
-            ItemStack resultingItem = null;
-            if (scheduleData.isRepair()) {
-                // return enchanted item
-                resultingItem = scheduleData.constructItem();
-                LOGGER.info(String.format("Resulting lores:\n%s", StringUtils.join(resultingItem.getItemMeta().getLore(), "\n")));
-                final int cost = scheduleData.getCost();
-                if (player.getLevel() >= cost) {
-                    player.setLevel(player.getLevel() - cost);
-                }
-                hasFinishedRepaired = true;
-            }
-            if (hasFinishedRepaired) {
+            ItemStack resultingItem = scheduleData.constructItem();
+            LOGGER.info(String.format("Resulting lores:\n%s", StringUtils.join(resultingItem.getItemMeta().getLore(), "\n")));
+            final int cost = scheduleData.getCost();
+            if (player.getLevel() >= cost) {
+                player.setLevel(player.getLevel() - cost);
                 anvil.setItem(0, new ItemStack(Material.AIR));
                 anvil.setItem(1, new ItemStack(Material.AIR));
                 anvil.setItem(2, new ItemStack(Material.AIR));
@@ -141,11 +137,23 @@ public class AnvilManager implements Listener {
         }
     }
 
-    private static ItemStack scheduleEnchantItemFromBook(ItemStack leftItem, ItemStack rightItem) {
+    private static ItemStack scheduleEnchantItemFromBook(AnvilRepairEnchantScheduler scheduleData, ItemStack leftItem, ItemStack rightItem) {
         // todo: method is invoked only when the enchantment book only contains custom enchants
-        final ItemStack itemStack = new ItemStack(leftItem);
-        final ItemMeta meta = itemStack.getItemMeta();
-        return itemStack;
+        final List<Enchantment> validEnchants = rightItem.getEnchantments().keySet().stream().filter(e -> e.canEnchantItem(leftItem)).collect(Collectors.toList());
+        if (validEnchants.isEmpty()) return null;
+        for (Enchantment enchantment : leftItem.getEnchantments().keySet()) {
+            scheduleData.addEnchantment(enchantment, leftItem.getEnchantmentLevel(enchantment));
+        }
+
+        for (Enchantment validEnchant : validEnchants) {
+            scheduleData.addEnchantment(validEnchant, rightItem.getEnchantmentLevel(validEnchant));
+        }
+
+        int cost = validEnchants.size() * 5;
+        scheduleData.setCost(cost);
+        scheduleData.setDisplayName(leftItem.getItemMeta().hasDisplayName() ? leftItem.getItemMeta().getDisplayName() : getName(leftItem));
+
+        return scheduleData.constructDisplayItem();
     }
 
     private static ItemStack scheduleRepairItem(AnvilRepairEnchantScheduler scheduleData, ItemStack leftItem, ItemStack rightItem, ItemStack resultingItem) {
@@ -164,6 +172,7 @@ public class AnvilManager implements Listener {
         // calculate repair cost
         int cost = getRepairCost(resultingItem) + getCustomEnchantmentCost(resultingItem) + 1;
         scheduleData.setCost(cost);
+        scheduleData.setDisplayName(resultingItem.getItemMeta().hasDisplayName() ? resultingItem.getItemMeta().getDisplayName() : getName(resultingItem));
         return scheduleData.constructDisplayItem();
     }
 
