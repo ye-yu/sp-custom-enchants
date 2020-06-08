@@ -6,10 +6,10 @@
 
     <groupId>sp.yeyu.customeenchants</groupId>
     <artifactId>enchant-plus</artifactId>
-    <version>0.2-snapshot1</version>
+    <version>0.2-snapshot2</version>
     <packaging>jar</packaging>
 
-    <name>Custom Enchants</name>
+    <name>Enchants Plus</name>
 
     <description>Spigot Custom Enchants Plugin</description>
     <properties>
