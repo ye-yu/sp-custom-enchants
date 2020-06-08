@@ -71,7 +71,6 @@ public class AnvilManager implements Listener {
                 scheduleData.setRepair(true);
                 scheduleData.setHasDisplayedItem(true);
             } else if (rightItem.getType().equals(Material.ENCHANTED_BOOK)) {
-                // todo: handle event when enchanting from incompatible book
                 final ItemStack enchantedItem = scheduleEnchantItemFromBook(scheduleData, leftItem, rightItem);
                 if (Objects.nonNull(enchantedItem)) {
                     anvil.setItem(2, enchantedItem);
@@ -137,7 +136,6 @@ public class AnvilManager implements Listener {
     }
 
     private static ItemStack scheduleEnchantItemFromBook(AnvilRepairEnchantScheduler scheduleData, ItemStack leftItem, ItemStack rightItem) {
-        // todo: method is invoked only when the enchantment book only contains custom enchants
         final List<Enchantment> validEnchants = rightItem.getEnchantments().keySet().stream().filter(e -> e.canEnchantItem(leftItem)).collect(Collectors.toList());
         if (validEnchants.isEmpty()) return null;
         for (Enchantment enchantment : leftItem.getEnchantments().keySet()) {
