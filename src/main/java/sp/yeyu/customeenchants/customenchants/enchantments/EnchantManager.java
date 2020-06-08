@@ -316,14 +316,13 @@ public class EnchantManager implements Listener {
 
         // prepare lore
         ArrayList<String> lores = Lists.newArrayList();
+        final List<String> oldLore = resultingItem.getItemMeta().getLore();
 
         // write item name to lore
         lores.add(ChatColor.AQUA + (meta.hasDisplayName() ? meta.getDisplayName() : getName(itemStack)));
 
-        // re-add vanilla enchantment lore
-        for (Enchantment enchantment : resultingItem.getEnchantments().keySet()) {
-            lores.add(ChatColor.GRAY + EnchantWrapper.getEnchantmentLoreName(enchantment, resultingItem.getEnchantmentLevel(enchantment)));
-        }
+        // add vanilla enchantment lore
+        lores.addAll(oldLore);
 
         // add custom enchantment lore
         for (EnchantWrapper customEnch : customEnchantments.keySet()) {
