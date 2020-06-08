@@ -19,44 +19,45 @@ import java.util.HashMap;
 
 public abstract class EnchantWrapper extends Enchantment {
 
-    final String name;
-    final int registeredId;
-    protected String description;
     public static final HashMap<String, String> vanillaEnchDisplayName = Maps.newHashMap();
     private static final Logger LOGGER = LogManager.getLogger();
 
     static {
-        vanillaEnchDisplayName.put("ARROW_DAMAGE","Power");
-        vanillaEnchDisplayName.put("ARROW_FIRE","Flame");
-        vanillaEnchDisplayName.put("ARROW_INFINITE","Infinity");
-        vanillaEnchDisplayName.put("ARROW_KNOCKBACK","Punch");
-        vanillaEnchDisplayName.put("BINDING_CURSE","Curse of Binding");
-        vanillaEnchDisplayName.put("DAMAGE_ALL","Sharpness");
-        vanillaEnchDisplayName.put("DAMAGE_ARTHROPODS","Bane of Arthropods");
-        vanillaEnchDisplayName.put("DAMAGE_UNDEAD","Smite");
-        vanillaEnchDisplayName.put("DEPTH_STRIDER","Depth Strider");
-        vanillaEnchDisplayName.put("DIG_SPEED","Efficiency");
-        vanillaEnchDisplayName.put("DURABILITY","Unbreaking");
-        vanillaEnchDisplayName.put("FIRE_ASPECT","Fire Aspect");
-        vanillaEnchDisplayName.put("FROST_WALKER","Frost Walker");
-        vanillaEnchDisplayName.put("KNOCKBACK","Knockback");
-        vanillaEnchDisplayName.put("LOOT_BONUS_BLOCKS","Fortune");
-        vanillaEnchDisplayName.put("LOOT_BONUS_MOBS","Looting");
-        vanillaEnchDisplayName.put("LUCK","Luck of the Sea");
-        vanillaEnchDisplayName.put("LURE","Lure");
-        vanillaEnchDisplayName.put("MENDING","Mending");
-        vanillaEnchDisplayName.put("OXYGEN","Respiration");
-        vanillaEnchDisplayName.put("PROTECTION_ENVIRONMENTAL","Protection");
-        vanillaEnchDisplayName.put("PROTECTION_EXPLOSIONS","Blast Protection");
-        vanillaEnchDisplayName.put("PROTECTION_FALL","Feather Falling");
-        vanillaEnchDisplayName.put("PROTECTION_FIRE","Fire Protection");
-        vanillaEnchDisplayName.put("PROTECTION_PROJECTILE","Projectile Protection");
-        vanillaEnchDisplayName.put("SILK_TOUCH","Silk Touch");
-        vanillaEnchDisplayName.put("SWEEPING_EDGE","Sweeping Edge");
-        vanillaEnchDisplayName.put("THORNS","Thorns");
-        vanillaEnchDisplayName.put("VANISHING_CURSE","Cure of Vanishing");
-        vanillaEnchDisplayName.put("WATER_WORKER","Aqua Affinity");
+        vanillaEnchDisplayName.put("ARROW_DAMAGE", "Power");
+        vanillaEnchDisplayName.put("ARROW_FIRE", "Flame");
+        vanillaEnchDisplayName.put("ARROW_INFINITE", "Infinity");
+        vanillaEnchDisplayName.put("ARROW_KNOCKBACK", "Punch");
+        vanillaEnchDisplayName.put("BINDING_CURSE", "Curse of Binding");
+        vanillaEnchDisplayName.put("DAMAGE_ALL", "Sharpness");
+        vanillaEnchDisplayName.put("DAMAGE_ARTHROPODS", "Bane of Arthropods");
+        vanillaEnchDisplayName.put("DAMAGE_UNDEAD", "Smite");
+        vanillaEnchDisplayName.put("DEPTH_STRIDER", "Depth Strider");
+        vanillaEnchDisplayName.put("DIG_SPEED", "Efficiency");
+        vanillaEnchDisplayName.put("DURABILITY", "Unbreaking");
+        vanillaEnchDisplayName.put("FIRE_ASPECT", "Fire Aspect");
+        vanillaEnchDisplayName.put("FROST_WALKER", "Frost Walker");
+        vanillaEnchDisplayName.put("KNOCKBACK", "Knockback");
+        vanillaEnchDisplayName.put("LOOT_BONUS_BLOCKS", "Fortune");
+        vanillaEnchDisplayName.put("LOOT_BONUS_MOBS", "Looting");
+        vanillaEnchDisplayName.put("LUCK", "Luck of the Sea");
+        vanillaEnchDisplayName.put("LURE", "Lure");
+        vanillaEnchDisplayName.put("MENDING", "Mending");
+        vanillaEnchDisplayName.put("OXYGEN", "Respiration");
+        vanillaEnchDisplayName.put("PROTECTION_ENVIRONMENTAL", "Protection");
+        vanillaEnchDisplayName.put("PROTECTION_EXPLOSIONS", "Blast Protection");
+        vanillaEnchDisplayName.put("PROTECTION_FALL", "Feather Falling");
+        vanillaEnchDisplayName.put("PROTECTION_FIRE", "Fire Protection");
+        vanillaEnchDisplayName.put("PROTECTION_PROJECTILE", "Projectile Protection");
+        vanillaEnchDisplayName.put("SILK_TOUCH", "Silk Touch");
+        vanillaEnchDisplayName.put("SWEEPING_EDGE", "Sweeping Edge");
+        vanillaEnchDisplayName.put("THORNS", "Thorns");
+        vanillaEnchDisplayName.put("VANISHING_CURSE", "Cure of Vanishing");
+        vanillaEnchDisplayName.put("WATER_WORKER", "Aqua Affinity");
     }
+
+    final String name;
+    final int registeredId;
+    protected String description;
 
     public EnchantWrapper(int id, String name) {
         super(id);
@@ -122,6 +123,12 @@ public abstract class EnchantWrapper extends Enchantment {
 
     }
 
+    public static String convertToDisplayName(Enchantment ench) {
+        if (!(ench instanceof EnchantWrapper))
+            return WordUtils.capitalize(String.join(" ", vanillaEnchDisplayName.getOrDefault(ench.getName(), "Unknown")));
+        return WordUtils.capitalize(String.join(" ", ench.getName().toLowerCase().split("_")));
+    }
+
     public String getDescription() {
         if (getMaxLevel() > 1)
             return String.format("%d: %s [I-%s] - %s", this.registeredId, convertToDisplayName(this), RomanNumeral.toRoman(getMaxLevel()), description);
@@ -140,13 +147,6 @@ public abstract class EnchantWrapper extends Enchantment {
     public String getVariableName() {
         return WordUtils.capitalize(name).replace(" ", "");
     }
-
-    public static String convertToDisplayName(Enchantment ench) {
-        if (!(ench instanceof EnchantWrapper))
-            return WordUtils.capitalize(String.join(" ", vanillaEnchDisplayName.getOrDefault(ench.getName(), "Unknown")));
-        return WordUtils.capitalize(String.join(" ", ench.getName().toLowerCase().split("_")));
-    }
-
 
     public abstract void applyEffect(Player player);
 

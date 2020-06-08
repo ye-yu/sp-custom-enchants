@@ -18,7 +18,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.Repairable;
 
 import java.util.Arrays;
@@ -81,7 +80,7 @@ public class AnvilManager implements Listener {
                     LOGGER.info("Item is being enchanted.");
                 }
             }
-            
+
             LOGGER.info("Resulting item lore:\n" + StringUtils.join(anvil.getItem(2).getItemMeta().getLore(), "\n"));
         } else {
             // prepare to return item
@@ -103,7 +102,7 @@ public class AnvilManager implements Listener {
 
     private static int getCustomEnchantmentCost(ItemStack item) {
         int cost = 0;
-        for (Enchantment ench: item.getEnchantments().keySet()) {
+        for (Enchantment ench : item.getEnchantments().keySet()) {
             if (ench instanceof EnchantWrapper)
                 cost += item.getEnchantmentLevel(ench);
         }

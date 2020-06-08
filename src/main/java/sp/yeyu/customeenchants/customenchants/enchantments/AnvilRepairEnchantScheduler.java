@@ -1,8 +1,6 @@
 package sp.yeyu.customeenchants.customenchants.enchantments;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.ChatColor;
@@ -11,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -19,24 +16,20 @@ import java.util.stream.Collectors;
 
 public class AnvilRepairEnchantScheduler {
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final String ACTUAL_COST_PREFIX = ChatColor.YELLOW + "Actual cost: ";
+    private static final HashMap<Player, AnvilRepairEnchantScheduler> schedule = Maps.newHashMap();
     private final ItemStack firstSlot;
     private final ItemStack secondSlot;
+    private final HashMap<Enchantment, Integer> enchantments = Maps.newHashMap();
     private ItemStack targetSlot;
     private String displayName = "";
     private int cost = 0;
-    private static final String ACTUAL_COST_PREFIX = ChatColor.YELLOW + "Actual cost: ";
-    private final HashMap<Enchantment, Integer> enchantments = Maps.newHashMap();
     private boolean isRepair;
     private boolean displayedItem = false;
-    private static final HashMap<Player, AnvilRepairEnchantScheduler> schedule = Maps.newHashMap();
 
     private AnvilRepairEnchantScheduler(ItemStack firstSlot, ItemStack secondSlot) {
         this.firstSlot = firstSlot;
         this.secondSlot = secondSlot;
-    }
-
-    public boolean hasEnchantments() {
-        return !enchantments.isEmpty();
     }
 
     public static AnvilRepairEnchantScheduler getScheduleData(Player player) {
@@ -47,13 +40,21 @@ public class AnvilRepairEnchantScheduler {
         return Objects.nonNull(schedule.remove(player));
     }
 
-    public boolean addEnchantment(Enchantment enchantment, int level) {
-        return Objects.isNull(enchantments.put(enchantment, level));
-    }
-
     public static AnvilRepairEnchantScheduler newScheduleData(Player player, ItemStack firstSlot, ItemStack secondSlot) {
         schedule.put(player, new AnvilRepairEnchantScheduler(firstSlot, secondSlot));
         return getScheduleData(player);
+    }
+
+    public static boolean hasData(Player player) {
+        return schedule.containsKey(player);
+    }
+
+    public boolean hasEnchantments() {
+        return !enchantments.isEmpty();
+    }
+
+    public boolean addEnchantment(Enchantment enchantment, int level) {
+        return Objects.isNull(enchantments.put(enchantment, level));
     }
 
     public boolean removeEnchantment(Enchantment enchantment) {
@@ -85,16 +86,20 @@ public class AnvilRepairEnchantScheduler {
         return item;
     }
 
-    public ItemStack getFirstSlot() { return firstSlot; }
-    public ItemStack getSecondSlot() { return secondSlot; }
-    public HashMap<Enchantment, Integer> getEnchantments() { return enchantments; }
+    public ItemStack getFirstSlot() {
+        return firstSlot;
+    }
+
+    public ItemStack getSecondSlot() {
+        return secondSlot;
+    }
+
+    public HashMap<Enchantment, Integer> getEnchantments() {
+        return enchantments;
+    }
 
     public boolean hasDisplayedItem() {
         return displayedItem;
-    }
-    
-    public static boolean hasData(Player player) {
-        return schedule.containsKey(player);
     }
 
     public void setHasDisplayedItem(boolean displayedItem) {
@@ -109,11 +114,13 @@ public class AnvilRepairEnchantScheduler {
         isRepair = repair;
     }
 
+    public String getDisplayName() {
+        return displayName;
+    }
+
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
-    
-    public String getDisplayName() { return displayName; }
 
     public ItemStack getTargetSlot() {
         return targetSlot;
@@ -123,9 +130,11 @@ public class AnvilRepairEnchantScheduler {
         this.targetSlot = targetSlot;
     }
 
+    public int getCost() {
+        return cost;
+    }
+
     public void setCost(int cost) {
         this.cost = cost;
     }
-
-    public int getCost() { return cost; }
 }
