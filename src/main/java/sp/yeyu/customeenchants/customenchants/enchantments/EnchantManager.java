@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -159,6 +158,7 @@ public class EnchantManager implements Listener {
                 enchantSlots.add(2, enchantedItem);
                 LOGGER.info("Item is being enchanted.");
             }
+            LOGGER.info("Resulting item lore:\n" +StringUtils.join(anvil.getItem(2).getItemMeta().getLore(), "\n"));
         } else if (enchantSlots.size() > 2) {
             // prepare to return item
             final ItemStack item = enchantSlots.get(0);
@@ -202,12 +202,8 @@ public class EnchantManager implements Listener {
 
     private static int getCustomEnchantmentCost(ItemStack item) {
         int cost = 0;
-        final int PER_ENCH_COST = 5;
         for (Enchantment ench: item.getEnchantments().keySet()) {
-            if (ench instanceof EnchantWrapper) {
-                int perLevelCost = (int)Math.ceil((double)PER_ENCH_COST / ench.getMaxLevel());
-                cost += perLevelCost * item.getEnchantmentLevel(ench);
-            }
+            cost += item.getEnchantmentLevel(ench);
         }
         return cost;
     }
@@ -215,7 +211,7 @@ public class EnchantManager implements Listener {
     private static int getRepairCost(ItemStack repairItem) {
         if (!(repairItem.getItemMeta() instanceof Repairable)) return 0;
         final Repairable itemMeta = (Repairable) repairItem.getItemMeta();
-        return itemMeta.getRepairCost();
+        return itemMeta.getRepairCost() + 1;
     }
 
     private static void whenClickingAnvilSlot(InventoryClickEvent e, AnvilInventory anvil, Player player) {
@@ -301,7 +297,6 @@ public class EnchantManager implements Listener {
             LOGGER.info("right item has the enchantment: " + ench.getName());
         }
 
-
         // add enchantment tag to the meta item to be appear in the third slot
         EnchantWrapper.enchantItem(itemStack, 1, EnchantPlus.EnchantEnum.ANVIL_TAG.getEnchantment());
 
@@ -328,6 +323,7 @@ public class EnchantManager implements Listener {
         // put in the actual cost in the lore
         lores.add(ChatColor.YELLOW + ACTUAL_COST_PREFIX + cost);
         meta.setDisplayName(ChatColor.AQUA + (meta.hasDisplayName() ? (ChatColor.ITALIC + meta.getDisplayName()) : getName(itemStack)));
+        meta.setLore(null);
         meta.setLore(lores);
         itemStack.setItemMeta(meta);
         return itemStack;
@@ -342,10 +338,12 @@ public class EnchantManager implements Listener {
                     leftEnchantments.put(
                             rightEnch,
                             rightEnchantments.get(rightEnch) >= rightEnch.getMaxLevel() ? rightEnch.getMaxLevel() : rightEnchantments.get(rightEnch) + 1);
-                } else if (leftEnchantments.keySet().stream().noneMatch(e -> e.conflictsWith(rightEnch))) { // only all nonc conflicting enchants
-                    leftEnchantments.put(rightEnch, rightEnchantments.get(rightEnch));
+                } else {
+                    leftEnchantments.put(
+                            rightEnch,
+                            Integer.max(leftItem.getEnchantmentLevel(rightEnch), rightItem.getEnchantmentLevel(rightEnch)));
                 }
-            } else {
+            } else if (leftEnchantments.keySet().stream().noneMatch(e -> e.conflictsWith(rightEnch))) { // only all nonc conflicting enchants
                 leftEnchantments.put(rightEnch, rightEnchantments.get(rightEnch));
             }
         }
