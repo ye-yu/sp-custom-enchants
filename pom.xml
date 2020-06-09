@@ -6,7 +6,7 @@
 
     <groupId>sp.yeyu.customeenchants</groupId>
     <artifactId>enchant-plus</artifactId>
-    <version>0.2-snapshot2</version>
+    <version>0.2</version>
     <packaging>jar</packaging>
 
     <name>Enchants Plus</name>
