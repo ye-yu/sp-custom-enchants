@@ -40,13 +40,19 @@ public class DataStorageInstance {
     }
 
     public String getOrDefault(String key, String def) {
-        return data.getOrDefault(key, def);
+        try {
+            return data.get(key);
+        } catch (NullPointerException npe) {
+            putAttr(key, def);
+            return def;
+        }
     }
 
     public Integer getIntegerOrDefault(String key, Integer def) {
         try {
             return Integer.parseInt(data.getOrDefault(key, def.toString()));
         } catch (NumberFormatException e) {
+            putAttr(key, def);
             return def;
         }
     }
@@ -55,6 +61,7 @@ public class DataStorageInstance {
         try {
             return Double.parseDouble(data.getOrDefault(key, def.toString()));
         } catch (NumberFormatException e) {
+            putAttr(key, def);
             return def;
         }
     }
