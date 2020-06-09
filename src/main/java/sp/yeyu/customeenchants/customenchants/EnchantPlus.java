@@ -14,6 +14,7 @@ import sp.yeyu.customeenchants.customenchants.commands.BuildChance;
 import sp.yeyu.customeenchants.customenchants.commands.Enchants;
 import sp.yeyu.customeenchants.customenchants.commands.ShowChance;
 import sp.yeyu.customeenchants.customenchants.enchantments.AnvilManager;
+import sp.yeyu.customeenchants.customenchants.enchantments.Boosted;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantManager;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
 import sp.yeyu.customeenchants.customenchants.enchantments.Focus;
@@ -29,18 +30,6 @@ public final class EnchantPlus extends JavaPlugin implements Listener {
     public static final Logger LOGGER = LogManager.getLogger(EnchantPlus.class);
     public static EnchantPlus ce;
     private static DataStorage CHANCE_DATA;
-
-    public static void registerEnchantment(Enchantment enchantment) {
-        try {
-            Field f = Enchantment.class.getDeclaredField("acceptingNew");
-            f.setAccessible(true);
-            f.set(null, true);
-            Enchantment.registerEnchantment(enchantment);
-            LOGGER.info("Registered " + enchantment.getName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     public static EnchantWrapper getEnchantmentByDisplayName(String displayName) {
         for (EnchantEnum enchantment : EnchantEnum.values()) {
@@ -59,10 +48,6 @@ public final class EnchantPlus extends JavaPlugin implements Listener {
         // Plugin startup logic
         CHANCE_DATA = new DataStorage(getName());
         ce = this;
-
-        // registering one enchantment
-        registerEnchantment(EnchantEnum.FOCUS_ENCHANTMENT.getEnchantment());
-        registerEnchantment(EnchantEnum.SPRINGY_ENCHANTMENT.getEnchantment());
 
         getServer().getPluginManager().registerEvents((Listener) EnchantEnum.FOCUS_ENCHANTMENT.getEnchantment(), this);
         getServer().getPluginManager().registerEvents(this, this);
@@ -90,27 +75,31 @@ public final class EnchantPlus extends JavaPlugin implements Listener {
 
     @SuppressWarnings("unchecked")
     public void onDisable() {
-        try {
-            Field byIdField = Enchantment.class.getDeclaredField("byId");
-            Field byNameField = Enchantment.class.getDeclaredField("byName");
+        for (EnchantEnum enchantEnum : EnchantEnum.values()) {
+            try {
+                Field byIdField = Enchantment.class.getDeclaredField("byId");
+                Field byNameField = Enchantment.class.getDeclaredField("byName");
 
-            byIdField.setAccessible(true);
-            byNameField.setAccessible(true);
+                byIdField.setAccessible(true);
+                byNameField.setAccessible(true);
 
-            HashMap<Integer, Enchantment> byId = (HashMap<Integer, Enchantment>) byIdField.get(null);
-            HashMap<String, Enchantment> byName = (HashMap<String, Enchantment>) byNameField.get(null);
+                HashMap<Integer, Enchantment> byId = (HashMap<Integer, Enchantment>) byIdField.get(null);
+                HashMap<String, Enchantment> byName = (HashMap<String, Enchantment>) byNameField.get(null);
 
-            int removeId = EnchantEnum.FOCUS_ENCHANTMENT.getEnchantment().getRegisteredId();
-            byId.remove(removeId);
-            byName.remove(EnchantEnum.FOCUS_ENCHANTMENT.getEnchantment().getName());
-
-        } catch (Exception ignored) {
+                int removeId = enchantEnum.getEnchantment().getRegisteredId();
+                byId.remove(removeId);
+                byName.remove(enchantEnum.getEnchantment().getName());
+            } catch (Exception e) {
+                LOGGER.error(String.format("Unable to unregister %s", enchantEnum.getEnchantment().getName()), e);
+            }
         }
+
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        player.setMaxHealth(20);
         EnchantManager.applyEnchantsOnPlayer(player);
     }
 
@@ -120,12 +109,14 @@ public final class EnchantPlus extends JavaPlugin implements Listener {
 
     public enum EnchantEnum {
         FOCUS_ENCHANTMENT(new Focus(131, "focus")),
-        SPRINGY_ENCHANTMENT(new Springy(132, "springy"));
+        SPRINGY_ENCHANTMENT(new Springy(132, "springy")),
+        BOOSTED_ENCHANTMENT(new Boosted(133, "boosted"));
 
         private final EnchantWrapper enchantment;
 
         EnchantEnum(EnchantWrapper enchantment) {
             this.enchantment = enchantment;
+            EnchantManager.registerEnchantment(this.getEnchantment());
         }
 
         public EnchantWrapper getEnchantment() {

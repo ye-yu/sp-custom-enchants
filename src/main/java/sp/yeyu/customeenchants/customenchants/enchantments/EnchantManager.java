@@ -1,5 +1,6 @@
 package sp.yeyu.customeenchants.customenchants.enchantments;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
+import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +29,7 @@ public class EnchantManager implements Listener {
 
     private static final Logger LOGGER = LogManager.getLogger(EnchantManager.class);
     private static final EnchantManager MANAGER = new EnchantManager(getRefreshRateFromData());
+    private static final ArrayList<Persistence> allPersistence = Lists.newArrayList();
 
     private final int refreshRate;
     private final int effectDuration;
@@ -38,12 +41,6 @@ public class EnchantManager implements Listener {
 
     private static HashMap<String, Integer> getRefreshRateFromData() {
         final DataStorageInstance data = EnchantPlus.getChanceData().getData(EnchantPlus.DEV_DATA_FILENAME);
-        if (!data.hasAttr(Attributes.REFRESH_RATE.attrName))
-            data.putAttr(Attributes.REFRESH_RATE.attrName, Attributes.REFRESH_RATE.defaultValue);
-
-        if (!data.hasAttr(Attributes.EFFECT_DURATION.attrName))
-            data.putAttr(Attributes.EFFECT_DURATION.attrName, Attributes.EFFECT_DURATION.defaultValue);
-
         HashMap<String, Integer> attributes = Maps.newHashMap();
         Integer refreshRate = data.getIntegerOrDefault(Attributes.REFRESH_RATE.attrName, Attributes.REFRESH_RATE.defaultValue);
         if (refreshRate < 1) {
@@ -77,13 +74,29 @@ public class EnchantManager implements Listener {
     public static void applyEnchantsOnPlayer(Player player) {
         for (ItemStack item : getEquipments(player)) {
             for (Enchantment ench : item.getEnchantments().keySet()) {
-                if (ench instanceof EnchantWrapper) {
+                if (ench instanceof EnchantWrapper && !(ench instanceof Persistence)) {
                     EnchantWrapper customEnchant = (EnchantWrapper) ench;
                     if (customEnchant.hasEffect()) {
                         customEnchant.applyEffect(player);
                     }
                 }
             }
+        }
+        allPersistence.forEach(e -> e.applyEffect(player));
+    }
+
+    public static void registerEnchantment(Enchantment enchantment) {
+        try {
+            Field f = Enchantment.class.getDeclaredField("acceptingNew");
+            f.setAccessible(true);
+            f.set(null, true);
+            Enchantment.registerEnchantment(enchantment);
+            if (enchantment instanceof Persistence) {
+                allPersistence.add((Persistence) enchantment);
+            }
+            LOGGER.info("Registered " + enchantment.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
