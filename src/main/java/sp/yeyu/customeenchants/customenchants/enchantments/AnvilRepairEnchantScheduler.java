@@ -66,11 +66,10 @@ public class AnvilRepairEnchantScheduler {
         enchantments.keySet().forEach(enchantment -> EnchantWrapper.enchantItemWithoutLore(item, enchantments.get(enchantment), enchantment));
         final ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(this.displayName);
-        List<String> lores = enchantments.keySet().stream().map(e -> EnchantWrapper.getEnchantmentLoreName(e, enchantments.get(e))).collect(Collectors.toList());
+        List<String> lores = enchantments.keySet().stream().filter(e -> e instanceof EnchantWrapper).map(e -> EnchantWrapper.getEnchantmentLoreName(e, enchantments.get(e))).collect(Collectors.toList());
         lores.add(ACTUAL_COST_PREFIX + cost);
         meta.setLore(lores);
         item.setItemMeta(meta);
-        LOGGER.info(String.format("Constructed item: %s", item));
         return item;
     }
 
@@ -79,10 +78,9 @@ public class AnvilRepairEnchantScheduler {
         enchantments.keySet().forEach(enchantment -> EnchantWrapper.enchantItemWithoutLore(item, enchantments.get(enchantment), enchantment));
         final ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(this.displayName);
-        List<String> lores = enchantments.keySet().stream().map(e -> EnchantWrapper.getEnchantmentLoreName(e, enchantments.get(e))).collect(Collectors.toList());
+        List<String> lores = enchantments.keySet().stream().filter(e -> e instanceof EnchantWrapper).map(e -> EnchantWrapper.getEnchantmentLoreName(e, enchantments.get(e))).collect(Collectors.toList());
         meta.setLore(lores);
         item.setItemMeta(meta);
-        LOGGER.info(String.format("Constructed item: %s", item));
         return item;
     }
 
