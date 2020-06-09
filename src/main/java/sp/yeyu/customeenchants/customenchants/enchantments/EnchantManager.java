@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,8 +27,6 @@ public class EnchantManager implements Listener {
 
     private static final Logger LOGGER = LogManager.getLogger(EnchantManager.class);
     private static final EnchantManager MANAGER = new EnchantManager(getRefreshRateFromData());
-    private static final HashMap<Player, ArrayList<ItemStack>> enchantSchedule = Maps.newHashMap();
-    private static final String ACTUAL_COST_PREFIX = ChatColor.YELLOW + "Actual cost: ";
 
     private final int refreshRate;
     private final int effectDuration;
