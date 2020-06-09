@@ -14,7 +14,6 @@ import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 import sp.yeyu.customeenchants.customenchants.utils.EntityUtils;
 
 public class Focus extends EnchantWrapper implements Listener {
-    private static final Logger LOGGER = LogManager.getLogger(Focus.class);
 
     public Focus(int id, String name) {
         super(id, name);

@@ -18,7 +18,7 @@ public class Boosted extends EnchantWrapper implements Listener, Persistence {
 
     public Boosted(int id, String name) {
         super(id, name);
-        this.description = "gives a health boost effect while equipping based on the level of enchant (does not stack; highest level is chosen)";
+        this.description = "gives a health boost effect based on the level of enchant (does not stack; highest level is chosen)";
     }
 
     @Override

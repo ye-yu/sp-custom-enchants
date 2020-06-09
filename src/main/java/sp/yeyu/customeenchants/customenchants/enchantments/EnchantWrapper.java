@@ -20,7 +20,6 @@ import java.util.HashMap;
 public abstract class EnchantWrapper extends Enchantment {
 
     public static final HashMap<String, String> vanillaEnchDisplayName = Maps.newHashMap();
-    private static final Logger LOGGER = LogManager.getLogger();
 
     static {
         vanillaEnchDisplayName.put("ARROW_DAMAGE", "Power");
