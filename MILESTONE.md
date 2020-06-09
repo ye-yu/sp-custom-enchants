@@ -13,7 +13,7 @@ added in this plugin.
     - LVL 3 = Jump Boost 3 
     - BOOTS
 
-2. Boosted [Levels 1-3] - Gives a permanet health boost effect based on the level of enchant. 
+2. **(Added in v0.3)** Boosted [Levels 1-3] - Gives a permanent health boost effect based on the level of enchant. 
     - LVL 1 = Health Boost 1, 
     - LVL 2 = Health Boost 2, 
     - LVL 3 = Health Boost 3 
