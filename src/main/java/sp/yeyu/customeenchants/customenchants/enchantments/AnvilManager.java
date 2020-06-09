@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Damageable;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -67,7 +68,7 @@ public class AnvilManager implements Listener {
             ItemStack rightItem = scheduleData.getSecondSlot();
             if (Objects.nonNull(anvil.getItem(2))) {
                 final ItemStack repairedItem = scheduleRepairItem(scheduleData, leftItem, rightItem, anvil.getItem(2));
-                anvil.setItem(2, repairedItem); // to prevent reference data overwritten
+                anvil.setItem(2, repairedItem);
                 scheduleData.setRepair(true);
                 scheduleData.setHasDisplayedItem(true);
             } else if (rightItem.getType().equals(Material.ENCHANTED_BOOK)) {
@@ -170,6 +171,8 @@ public class AnvilManager implements Listener {
         int cost = getRepairCost(resultingItem) + getCustomEnchantmentCost(resultingItem) + 1;
         scheduleData.setCost(cost);
         scheduleData.setDisplayName(resultingItem.getItemMeta().hasDisplayName() ? resultingItem.getItemMeta().getDisplayName() : getName(resultingItem));
+
+        scheduleData.setDamage(resultingItem.getDurability());
         return scheduleData.constructDisplayItem();
     }
 

@@ -26,6 +26,7 @@ public class AnvilRepairEnchantScheduler {
     private int cost = 0;
     private boolean isRepair;
     private boolean displayedItem = false;
+    private Short damage = null;
 
     private AnvilRepairEnchantScheduler(ItemStack firstSlot, ItemStack secondSlot) {
         this.firstSlot = firstSlot;
@@ -63,6 +64,9 @@ public class AnvilRepairEnchantScheduler {
 
     public ItemStack constructDisplayItem() {
         final ItemStack item = new ItemStack(firstSlot.getType());
+        if (Objects.nonNull(damage)) {
+            item.setDurability(damage);
+        }
         enchantments.keySet().forEach(enchantment -> EnchantWrapper.enchantItemWithoutLore(item, enchantments.get(enchantment), enchantment));
         final ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(this.displayName);
@@ -75,6 +79,9 @@ public class AnvilRepairEnchantScheduler {
 
     public ItemStack constructItem() {
         final ItemStack item = new ItemStack(firstSlot.getType());
+        if (Objects.nonNull(damage)) {
+            item.setDurability(damage);
+        }
         enchantments.keySet().forEach(enchantment -> EnchantWrapper.enchantItemWithoutLore(item, enchantments.get(enchantment), enchantment));
         final ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(this.displayName);
@@ -134,5 +141,9 @@ public class AnvilRepairEnchantScheduler {
 
     public void setCost(int cost) {
         this.cost = cost;
+    }
+
+    public void setDamage(Short damage) {
+        this.damage = damage;
     }
 }
