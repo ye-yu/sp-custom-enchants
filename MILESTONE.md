@@ -7,7 +7,7 @@ added in this plugin.
 
 ##### ENCHANTS - HIGH CHANCE TO GET THESE
 
-1. Springy [Levels 1-3] - Gives the player a permanent jump boost effect based on the level of enchant. 
+1. **(Added in v0.1)** Springy [Levels 1-3]~ - Gives the player a permanent jump boost effect based on the level of enchant. 
     - LVL 1 = Jump Boost 1, 
     - LVL 2 = Jump Boost 2, 
     - LVL 3 = Jump Boost 3 
