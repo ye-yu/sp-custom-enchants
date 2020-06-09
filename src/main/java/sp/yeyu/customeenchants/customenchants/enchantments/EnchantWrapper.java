@@ -69,6 +69,10 @@ public abstract class EnchantWrapper extends Enchantment {
         return enchant.getVariableName() + "Chance";
     }
 
+    public static String getTickSkipVariableName(EnchantWrapper enchant) {
+        return enchant.getVariableName() + "TickSkip";
+    }
+
     public static double increaseEnchantmentChanceForPlayer(EnchantWrapper enchantment, Player player, double chance) {
         String enchantId = EnchantWrapper.getChanceVariableName(enchantment);
         final DataStorageInstance playerData = EnchantPlus.getChanceData().getPlayerData(player);
