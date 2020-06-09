@@ -62,7 +62,6 @@ public class Focus extends EnchantWrapper implements Listener {
             LivingEntity attacker = (LivingEntity) target.getDamager();
             if (attacker.getEquipment().getItemInHand().containsEnchantment(EnchantPlus.EnchantEnum.FOCUS_ENCHANTMENT.getEnchantment())) {
                 if (!EntityUtils.isValidCritical(attacker)) {
-                    LOGGER.info(String.format("Applying critial hits to %s. Damage before: %.02f. Damage after: %.02f", target.getEntity().getName(), target.getDamage(), target.getDamage() * 1.5));
                     double damage = target.getDamage() * 1.5;
                     target.setDamage(damage);
                 }

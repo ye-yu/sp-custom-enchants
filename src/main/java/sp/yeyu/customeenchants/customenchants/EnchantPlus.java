@@ -57,9 +57,7 @@ public final class EnchantPlus extends JavaPlugin implements Listener {
 
         final DataStorageInstance data = CHANCE_DATA.getData("dev.txt");
         final int devMode = data.getIntegerOrDefault("devmode", 0);
-        if (devMode == 0) {
-            data.putAttr("devmode", 0);
-        } else {
+        if (devMode != 0) {
             LOGGER.info("(CustomEnchants) Developer mode is on.");
         }
 

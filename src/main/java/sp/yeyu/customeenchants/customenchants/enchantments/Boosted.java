@@ -10,9 +10,6 @@ import org.bukkit.potion.PotionEffectType;
 import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 
 import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Boosted extends EnchantWrapper implements Listener, Persistence {
