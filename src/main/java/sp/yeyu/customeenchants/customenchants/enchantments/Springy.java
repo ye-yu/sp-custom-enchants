@@ -7,6 +7,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import sp.yeyu.customeenchants.customenchants.EnchantPlus;
+import sp.yeyu.customeenchants.customenchants.managers.EnchantManager;
+import sp.yeyu.customeenchants.customenchants.utils.EnchantUtils;
 
 import java.util.Objects;
 
@@ -52,6 +54,6 @@ public class Springy extends EnchantWrapper implements Listener {
 
     @Override
     public boolean canEnchantItem(ItemStack item) {
-        return getItemTarget().includes(item) || EnchantWrapper.isBook(item);
+        return getItemTarget().includes(item) || EnchantUtils.isBook(item);
     }
 }

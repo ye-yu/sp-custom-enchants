@@ -13,9 +13,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import sp.yeyu.customeenchants.customenchants.commands.BuildChance;
 import sp.yeyu.customeenchants.customenchants.commands.Enchants;
 import sp.yeyu.customeenchants.customenchants.commands.ShowChance;
-import sp.yeyu.customeenchants.customenchants.enchantments.AnvilManager;
+import sp.yeyu.customeenchants.customenchants.managers.AnvilManager;
 import sp.yeyu.customeenchants.customenchants.enchantments.Boosted;
-import sp.yeyu.customeenchants.customenchants.enchantments.EnchantManager;
+import sp.yeyu.customeenchants.customenchants.managers.EnchantManager;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
 import sp.yeyu.customeenchants.customenchants.enchantments.Focus;
 import sp.yeyu.customeenchants.customenchants.enchantments.Springy;
@@ -28,26 +28,16 @@ import java.util.HashMap;
 public final class EnchantPlus extends JavaPlugin implements Listener {
     public static final String DEV_DATA_FILENAME = "dev.txt";
     public static final Logger LOGGER = LogManager.getLogger(EnchantPlus.class);
-    public static EnchantPlus ce;
-    private static DataStorage CHANCE_DATA;
+    private static DataStorage PLUGIN_DATA;
 
-    public static EnchantWrapper getEnchantmentByDisplayName(String displayName) {
-        for (EnchantEnum enchantment : EnchantEnum.values()) {
-            if (enchantment.getEnchantment().getName().equalsIgnoreCase(displayName))
-                return enchantment.getEnchantment();
-        }
-        return null;
-    }
-
-    public static DataStorage getChanceData() {
-        return CHANCE_DATA;
+    public static DataStorage getPluginData() {
+        return PLUGIN_DATA;
     }
 
     @Override
     public void onEnable() {
         // Plugin startup logic
-        CHANCE_DATA = new DataStorage(getName());
-        ce = this;
+        PLUGIN_DATA = new DataStorage(getName());
 
         getServer().getPluginManager().registerEvents((Listener) EnchantEnum.FOCUS_ENCHANTMENT.getEnchantment(), this);
         getServer().getPluginManager().registerEvents(this, this);
@@ -55,7 +45,7 @@ public final class EnchantPlus extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(EnchantManager.getEnchantManager(), this);
 
 
-        final DataStorageInstance data = CHANCE_DATA.getData("dev.txt");
+        final DataStorageInstance data = PLUGIN_DATA.getData("dev.txt");
         final int devMode = data.getIntegerOrDefault("devmode", 0);
         if (devMode != 0) {
             LOGGER.info("(CustomEnchants) Developer mode is on.");

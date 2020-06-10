@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
+import sp.yeyu.customeenchants.customenchants.utils.EnchantUtils;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -41,7 +42,7 @@ public class BuildChance implements CommandExecutor {
             enchantmentName = StringUtils.join(Arrays.copyOfRange(args, 1, args.length), " ");
         }
 
-        final EnchantWrapper enchantment = EnchantPlus.getEnchantmentByDisplayName(enchantmentName);
+        final EnchantWrapper enchantment = EnchantUtils.getEnchantmentByDisplayName(enchantmentName);
         if (Objects.isNull(enchantment)) {
             sender.sendMessage("Cannot find enchantment of " + enchantmentName);
             return false;
@@ -53,7 +54,7 @@ public class BuildChance implements CommandExecutor {
             return false;
         }
 
-        final double newChance = EnchantWrapper.increaseEnchantmentChanceForPlayer(enchantment, player, increaseChance);
+        final double newChance = EnchantUtils.increaseEnchantmentChanceForPlayer(enchantment, player, increaseChance);
         sender.sendMessage(String.format("Now %s has %.02f%% chance of getting %s", player.getDisplayName(), newChance, enchantmentName));
         return true;
     }

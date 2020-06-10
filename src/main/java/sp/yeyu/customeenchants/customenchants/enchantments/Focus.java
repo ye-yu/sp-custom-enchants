@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import sp.yeyu.customeenchants.customenchants.EnchantPlus;
+import sp.yeyu.customeenchants.customenchants.utils.EnchantUtils;
 import sp.yeyu.customeenchants.customenchants.utils.EntityUtils;
 
 public class Focus extends EnchantWrapper implements Listener {
@@ -52,7 +53,7 @@ public class Focus extends EnchantWrapper implements Listener {
 
     @Override
     public boolean canEnchantItem(ItemStack item) {
-        return getItemTarget().includes(item) || EnchantWrapper.isBook(item);
+        return getItemTarget().includes(item) || EnchantUtils.isBook(item);
     }
 
     @EventHandler

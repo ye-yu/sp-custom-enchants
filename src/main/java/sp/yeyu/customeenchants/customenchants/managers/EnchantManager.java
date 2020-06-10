@@ -1,4 +1,4 @@
-package sp.yeyu.customeenchants.customenchants.enchantments;
+package sp.yeyu.customeenchants.customenchants.managers;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -13,6 +13,9 @@ import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import sp.yeyu.customeenchants.customenchants.EnchantPlus;
+import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
+import sp.yeyu.customeenchants.customenchants.enchantments.Persistence;
+import sp.yeyu.customeenchants.customenchants.utils.EnchantUtils;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
 import java.lang.reflect.Field;
@@ -40,7 +43,7 @@ public class EnchantManager implements Listener {
     }
 
     private static HashMap<String, Integer> getRefreshRateFromData() {
-        final DataStorageInstance data = EnchantPlus.getChanceData().getData(EnchantPlus.DEV_DATA_FILENAME);
+        final DataStorageInstance data = EnchantPlus.getPluginData().getData(EnchantPlus.DEV_DATA_FILENAME);
         HashMap<String, Integer> attributes = Maps.newHashMap();
         Integer refreshRate = data.getIntegerOrDefault(Attributes.REFRESH_RATE.attrName, Attributes.REFRESH_RATE.defaultValue);
         if (refreshRate < 1) {
@@ -127,12 +130,12 @@ public class EnchantManager implements Listener {
         for (EnchantPlus.EnchantEnum ench : EnchantPlus.EnchantEnum.values()) {
             final EnchantWrapper enchantment = ench.getEnchantment();
             if (enchantment.canEnchantItem(item)) {
-                final Double chance = EnchantPlus.getChanceData().getPlayerData(itemEvent.getEnchanter()).getDoubleOrDefault(EnchantWrapper.getChanceVariableName(enchantment), 0D);
+                final Double chance = EnchantPlus.getPluginData().getPlayerData(itemEvent.getEnchanter()).getDoubleOrDefault(EnchantUtils.getChanceVariableName(enchantment), 0D);
                 final double roll = random.nextDouble() * 100 + 1;
                 if (chance > roll) {
                     int level = random.nextInt(enchantment.getMaxLevel()) + 1;
-                    EnchantWrapper.enchantItem(item, level, enchantment);
-                    EnchantWrapper.reduceEnchantmentChanceForPlayer(enchantment, itemEvent.getEnchanter(), chance * 0.2);
+                    EnchantUtils.enchantItem(item, level, enchantment);
+                    EnchantUtils.reduceEnchantmentChanceForPlayer(enchantment, itemEvent.getEnchanter(), chance * 0.2);
                     count++;
                 }
 
