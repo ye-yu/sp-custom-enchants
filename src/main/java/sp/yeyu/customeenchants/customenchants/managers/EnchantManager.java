@@ -1,7 +1,6 @@
 package sp.yeyu.customeenchants.customenchants.managers;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -13,15 +12,16 @@ import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import sp.yeyu.customeenchants.customenchants.EnchantPlus;
+import sp.yeyu.customeenchants.customenchants.enchantments.Boosted;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
+import sp.yeyu.customeenchants.customenchants.enchantments.Focus;
 import sp.yeyu.customeenchants.customenchants.enchantments.Persistence;
+import sp.yeyu.customeenchants.customenchants.enchantments.Springy;
 import sp.yeyu.customeenchants.customenchants.utils.EnchantUtils;
-import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
 import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -30,43 +30,8 @@ import java.util.stream.Stream;
 
 public class EnchantManager implements Listener {
 
-    private static final Logger LOGGER = LogManager.getLogger(EnchantManager.class);
-    private static final EnchantManager MANAGER = new EnchantManager(getRefreshRateFromData());
     private static final ArrayList<Persistence> allPersistence = Lists.newArrayList();
-
-    private final int refreshRate;
-    private final int effectDuration;
-
-    private EnchantManager(HashMap<String, Integer> attributes) {
-        this.refreshRate = attributes.get(Attributes.REFRESH_RATE.attrName);
-        this.effectDuration = attributes.get(Attributes.EFFECT_DURATION.attrName);
-    }
-
-    private static HashMap<String, Integer> getRefreshRateFromData() {
-        final DataStorageInstance data = EnchantPlus.getPluginData().getData(EnchantPlus.DEV_DATA_FILENAME);
-        HashMap<String, Integer> attributes = Maps.newHashMap();
-        Integer refreshRate = data.getIntegerOrDefault(Attributes.REFRESH_RATE.attrName, Attributes.REFRESH_RATE.defaultValue);
-        if (refreshRate < 1) {
-            refreshRate = Attributes.REFRESH_RATE.defaultValue;
-            data.putAttr(Attributes.REFRESH_RATE.attrName, Attributes.REFRESH_RATE.defaultValue);
-            LOGGER.error(String.format("Refresh rate of less than 1 is too quick or unrealistic! Setting refresh rate to %d ticks.", refreshRate));
-        }
-
-        Integer effectDuration = data.getIntegerOrDefault(Attributes.EFFECT_DURATION.attrName, Attributes.EFFECT_DURATION.defaultValue);
-        if (effectDuration < 1) {
-            effectDuration = Attributes.EFFECT_DURATION.defaultValue;
-            data.putAttr(Attributes.EFFECT_DURATION.attrName, Attributes.EFFECT_DURATION.defaultValue);
-            LOGGER.error(String.format("Effect duration cannot be zero ticks or less. Setting effect duration to %d ticks.", effectDuration));
-        }
-
-        attributes.put(Attributes.REFRESH_RATE.attrName, refreshRate);
-        attributes.put(Attributes.EFFECT_DURATION.attrName, effectDuration);
-        return attributes;
-    }
-
-    public static EnchantManager getEnchantManager() {
-        return MANAGER;
-    }
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static void applyEnchants() {
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -97,7 +62,7 @@ public class EnchantManager implements Listener {
             if (enchantment instanceof Persistence) {
                 allPersistence.add((Persistence) enchantment);
             }
-            LOGGER.info("Registered " + enchantment.getName());
+            LOGGER.info(String.format("(%s) Registered %s", EnchantPlus.PLUGIN_NAME, enchantment.getName()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -108,18 +73,6 @@ public class EnchantManager implements Listener {
         return Stream.of(equipment.getItemInHand(), equipment.getHelmet(), equipment.getChestplate(), equipment.getLeggings(), equipment.getBoots()).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    public static int calculateTotalEffectDuration() {
-        return getEnchantManager().getRefreshRate() + getEnchantManager().getEffectDuration();
-    }
-
-    public int getEffectDuration() {
-        return effectDuration;
-    }
-
-    public int getRefreshRate() {
-        return refreshRate;
-    }
-
     @EventHandler
     public void onEnchant(EnchantItemEvent itemEvent) {
         if (itemEvent.getEnchanter().getLevel() < 30) return;
@@ -127,7 +80,7 @@ public class EnchantManager implements Listener {
         int count = 0;
         final ItemStack item = itemEvent.getItem();
         final Random random = new Random(Instant.now().toEpochMilli());
-        for (EnchantPlus.EnchantEnum ench : EnchantPlus.EnchantEnum.values()) {
+        for (EnchantEnum ench : EnchantEnum.values()) {
             final EnchantWrapper enchantment = ench.getEnchantment();
             if (enchantment.canEnchantItem(item)) {
                 final Double chance = EnchantPlus.getPluginData().getPlayerData(itemEvent.getEnchanter()).getDoubleOrDefault(EnchantUtils.getChanceVariableName(enchantment), 0D);
@@ -146,16 +99,21 @@ public class EnchantManager implements Listener {
         }
     }
 
-    private enum Attributes {
-        REFRESH_RATE("refreshTickRate", 5),
-        EFFECT_DURATION("effectDurationTick", 60);
 
-        public final String attrName;
-        public final int defaultValue;
+    public enum EnchantEnum {
+        FOCUS_ENCHANTMENT(new Focus(131, "FOCUS", EnchantWrapper.Rarity.RARE)),
+        SPRINGY_ENCHANTMENT(new Springy(132, "SPRINGY", EnchantWrapper.Rarity.COMMON)),
+        BOOSTED_ENCHANTMENT(new Boosted(133, "BOOSTED", EnchantWrapper.Rarity.COMMON));
 
-        Attributes(String attrName, int value) {
-            this.attrName = attrName;
-            this.defaultValue = value;
+        private final EnchantWrapper enchantment;
+
+        EnchantEnum(EnchantWrapper enchantment) {
+            this.enchantment = enchantment;
+            registerEnchantment(this.getEnchantment());
+        }
+
+        public EnchantWrapper getEnchantment() {
+            return enchantment;
         }
     }
 }

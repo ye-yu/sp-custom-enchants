@@ -14,8 +14,8 @@ public abstract class EnchantWrapper extends Enchantment {
 
     final String name;
     final int registeredId;
-    protected String description;
     final Rarity rarity;
+    protected String description;
 
     public EnchantWrapper(int id, String name, Rarity rarity) {
         super(id);
@@ -62,6 +62,7 @@ public abstract class EnchantWrapper extends Enchantment {
         HEROIC(ChatColor.LIGHT_PURPLE);
 
         public final ChatColor colorCode;
+
         Rarity(ChatColor colCode) {
             this.colorCode = colCode;
         }
