@@ -21,6 +21,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.Repairable;
+import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
 import sp.yeyu.customeenchants.customenchants.utils.EnchantUtils;
 
@@ -42,6 +43,7 @@ public class AnvilManager implements Listener {
     public static void onInventoryClick(InventoryClickEvent e) {
         // check whether the event has been cancelled by another plugin
         if (e.isCancelled()) return;
+        if (EnchantPlus.getPluginData().getData(EnchantPlus.DEV_DATA_FILENAME).getIntegerOrDefault("useExperimentalAnvil", 0) == 0) return ;
         HumanEntity ent = e.getWhoClicked();
 
         // not really necessary
