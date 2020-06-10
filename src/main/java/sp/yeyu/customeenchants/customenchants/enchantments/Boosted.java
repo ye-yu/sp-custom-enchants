@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
-import sp.yeyu.customeenchants.customenchants.EnchantPlus;
+import sp.yeyu.customeenchants.customenchants.managers.EnchantManager;
 import sp.yeyu.customeenchants.customenchants.utils.EnchantUtils;
 
 import java.util.ArrayList;
@@ -17,14 +17,14 @@ public class Boosted extends EnchantWrapper implements Listener, Persistence {
 
     private static final ArrayList<Player> healthBoostSchedule = Lists.newArrayList();
 
-    public Boosted(int id, String name) {
-        super(id, name);
+    public Boosted(int id, String name, Rarity rarity) {
+        super(id, name, rarity);
         this.description = "gives a health boost effect based on the level of enchant (does not stack; highest level is chosen)";
     }
 
     @Override
     public void applyEffect(Player player) {
-        final Enchantment ench = EnchantPlus.EnchantEnum.BOOSTED_ENCHANTMENT.getEnchantment();
+        final Enchantment ench = EnchantManager.EnchantEnum.BOOSTED_ENCHANTMENT.getEnchantment();
         int level = Stream.of(player.getEquipment().getArmorContents()).map(e -> e.getEnchantmentLevel(ench)).reduce(Integer::max).orElse(0);
         player.setMaxHealth(20 + 4 * level);
         if (level == 0) {

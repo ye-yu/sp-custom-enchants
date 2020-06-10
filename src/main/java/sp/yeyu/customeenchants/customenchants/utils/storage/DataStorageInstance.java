@@ -50,8 +50,8 @@ public class DataStorageInstance {
 
     public Integer getIntegerOrDefault(String key, Integer def) {
         try {
-            return Integer.parseInt(data.getOrDefault(key, def.toString()));
-        } catch (NumberFormatException e) {
+            return Integer.parseInt(data.get(key));
+        } catch (NumberFormatException | NullPointerException e) {
             putAttr(key, def);
             return def;
         }
@@ -59,8 +59,8 @@ public class DataStorageInstance {
 
     public Double getDoubleOrDefault(String key, Double def) {
         try {
-            return Double.parseDouble(data.getOrDefault(key, def.toString()));
-        } catch (NumberFormatException e) {
+            return Double.parseDouble(data.get(key));
+        } catch (NumberFormatException | NullPointerException e) {
             putAttr(key, def);
             return def;
         }
@@ -74,7 +74,6 @@ public class DataStorageInstance {
     private boolean writeDataToFile() {
         try (FileWriter writer = new FileWriter(getFileInstance())) {
             for (String k : data.keySet()) {
-                LOGGER.info("Writing: " + k + SEPARATOR + data.get(k));
                 writer.write(k + SEPARATOR + data.get(k));
                 writer.write("\n");
             }

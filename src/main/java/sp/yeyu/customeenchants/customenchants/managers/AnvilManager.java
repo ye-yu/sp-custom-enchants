@@ -3,8 +3,6 @@ package sp.yeyu.customeenchants.customenchants.managers;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -21,7 +19,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.Repairable;
-import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
 import sp.yeyu.customeenchants.customenchants.utils.EnchantUtils;
 
@@ -33,7 +30,6 @@ import java.util.stream.Collectors;
 
 public class AnvilManager implements Listener {
 
-    private static final Logger LOGGER = LogManager.getLogger(AnvilManager.class);
     private static final HashMap<Player, ItemStack> pickUpSchedule = Maps.newHashMap();
 
     /*
@@ -43,7 +39,7 @@ public class AnvilManager implements Listener {
     public static void onInventoryClick(InventoryClickEvent e) {
         // check whether the event has been cancelled by another plugin
         if (e.isCancelled()) return;
-        if (EnchantPlus.getPluginData().getData(EnchantPlus.DEV_DATA_FILENAME).getIntegerOrDefault("useExperimentalAnvil", 0) == 0) return ;
+        if (DataManager.IntAttributes.EXPERIMENTAL_ANVIL.getValue() == 0) return;
         HumanEntity ent = e.getWhoClicked();
 
         // not really necessary
@@ -82,15 +78,11 @@ public class AnvilManager implements Listener {
                     anvil.setItem(2, enchantedItem);
                     scheduleData.setRepair(false);
                     scheduleData.setHasDisplayedItem(true);
-                    LOGGER.info("Item is being enchanted.");
                 }
             }
-
-            LOGGER.info("Resulting item lore:\n" + StringUtils.join(anvil.getItem(2).getItemMeta().getLore(), "\n"));
         } else {
             // prepare to return item
             ItemStack resultingItem = scheduleData.constructItem();
-            LOGGER.info(String.format("Resulting lores:\n%s", StringUtils.join(resultingItem.getItemMeta().getLore(), "\n")));
             final int cost = scheduleData.getCost();
             if (player.getLevel() >= cost) {
                 player.setLevel(player.getLevel() - cost);
@@ -111,28 +103,24 @@ public class AnvilManager implements Listener {
             if (ench instanceof EnchantWrapper)
                 cost += item.getEnchantmentLevel(ench);
         }
-        LOGGER.info(String.format("%s has the additional repair cost of %d", item.getType(), cost));
         return cost;
     }
 
     private static int getRepairCost(ItemStack repairItem) {
         if (!(repairItem.getItemMeta() instanceof Repairable)) return 1;
         final Repairable itemMeta = (Repairable) repairItem.getItemMeta();
-        LOGGER.info(String.format("%s has the vanilla repair cost of %d", repairItem.getType(), itemMeta.getRepairCost()));
         return itemMeta.getRepairCost();
     }
 
     private static void whenClickingAnvilSlot(InventoryClickEvent e, AnvilInventory anvil, Player player) {
         AnvilRepairEnchantScheduler.removeScheduleData(player); // always reset when user perform inventory change
         if (e.getRawSlot() < 2) {
-            LOGGER.info(String.format("Player is clicking from the anvil slots. %s", e.getAction()));
             if (Arrays.asList(InventoryAction.PLACE_ALL, InventoryAction.PLACE_SOME, InventoryAction.PLACE_ONE, InventoryAction.SWAP_WITH_CURSOR).contains(e.getAction())) {
                 insertItemInAnvilThirdSlot(anvil.getItem(0), anvil.getItem(1), e.getRawSlot(), player);
             } else if (Arrays.asList(InventoryAction.PICKUP_ALL, InventoryAction.PICKUP_HALF, InventoryAction.PICKUP_SOME, InventoryAction.PICKUP_HALF, InventoryAction.PICKUP_ONE).contains(e.getAction())) {
                 pickUpSchedule.put(player, e.getCurrentItem());
             }
         } else {
-            LOGGER.info("Player is clicking from their inventory slots.");
             if (e.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 insertItemInAnvilThirdSlotFromShiftClick(e, anvil, player);
             } else if (Arrays.asList(InventoryAction.PICKUP_ALL, InventoryAction.PICKUP_HALF, InventoryAction.PICKUP_SOME, InventoryAction.PICKUP_HALF, InventoryAction.PICKUP_ONE).contains(e.getAction())) {
@@ -207,7 +195,6 @@ public class AnvilManager implements Listener {
         final HashMap<EnchantWrapper, Integer> customEnchants = Maps.newHashMap();
         for (EnchantWrapper customEnch : collect) {
             customEnchants.put(customEnch, itemStack.getEnchantmentLevel(customEnch));
-            LOGGER.info(String.format("%s has the custom enchantment: %s", itemStack.getType(), EnchantUtils.convertToDisplayName(customEnch)));
         }
         return customEnchants;
     }
@@ -218,12 +205,9 @@ public class AnvilManager implements Listener {
         ItemStack currentItem = pickUpSchedule.remove(player);
         if (rawSlot == 1) {
             AnvilRepairEnchantScheduler.newScheduleData(player, leftItem, currentItem);
-            LOGGER.info(String.format("Anvil now has %s in the left slot and %s in the right slot.", leftItem, currentItem));
         } else {
             AnvilRepairEnchantScheduler.newScheduleData(player, currentItem, rightItem);
-            LOGGER.info(String.format("Anvil now has %s in the left slot and %s in the right slot.", currentItem, rightItem));
         }
-        LOGGER.info(String.format("Anvil actually has %s in the left slot and %s in the right slot.", leftItem, rightItem));
     }
 
     public static String getName(ItemStack itemStack) {

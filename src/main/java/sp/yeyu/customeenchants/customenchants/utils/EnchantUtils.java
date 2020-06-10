@@ -10,6 +10,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
+import sp.yeyu.customeenchants.customenchants.managers.DataManager;
+import sp.yeyu.customeenchants.customenchants.managers.EnchantManager;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
 import java.util.ArrayList;
@@ -52,7 +54,7 @@ public class EnchantUtils {
     }
 
     public static EnchantWrapper getEnchantmentByDisplayName(String displayName) {
-        for (EnchantPlus.EnchantEnum enchantment : EnchantPlus.EnchantEnum.values()) {
+        for (EnchantManager.EnchantEnum enchantment : EnchantManager.EnchantEnum.values()) {
             if (convertToDisplayName(enchantment.getEnchantment()).equalsIgnoreCase(displayName))
                 return enchantment.getEnchantment();
         }
@@ -123,5 +125,7 @@ public class EnchantUtils {
         return WordUtils.capitalize(String.join(" ", ench.getName().toLowerCase().split("_")));
     }
 
-
+    public static int calculateTotalEffectDuration() {
+        return DataManager.IntAttributes.REFRESH_RATE.getValue() + DataManager.IntAttributes.EFFECT_DURATION.getValue();
+    }
 }

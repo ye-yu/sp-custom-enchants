@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
-import sp.yeyu.customeenchants.customenchants.EnchantPlus;
 import sp.yeyu.customeenchants.customenchants.managers.EnchantManager;
 import sp.yeyu.customeenchants.customenchants.utils.EnchantUtils;
 
@@ -14,8 +13,8 @@ import java.util.Objects;
 
 public class Springy extends EnchantWrapper implements Listener {
 
-    public Springy(int id, String name) {
-        super(id, name);
+    public Springy(int id, String name, Rarity rarity) {
+        super(id, name, rarity);
         this.description = "gives a jump boost effect based on the level of enchant";
     }
 
@@ -23,8 +22,8 @@ public class Springy extends EnchantWrapper implements Listener {
     public void applyEffect(Player player) {
         final ItemStack boots = player.getEquipment().getBoots();
         if (Objects.isNull(boots)) return;
-        final int level = boots.getEnchantmentLevel(EnchantPlus.EnchantEnum.SPRINGY_ENCHANTMENT.getEnchantment()) - 1;
-        player.addPotionEffect(PotionEffectType.JUMP.createEffect(EnchantManager.calculateTotalEffectDuration(), level), true);
+        final int level = boots.getEnchantmentLevel(EnchantManager.EnchantEnum.SPRINGY_ENCHANTMENT.getEnchantment()) - 1;
+        player.addPotionEffect(PotionEffectType.JUMP.createEffect(EnchantUtils.calculateTotalEffectDuration(), level), true);
     }
 
     @Override

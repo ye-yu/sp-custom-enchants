@@ -26,7 +26,8 @@ public class BuildChance implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!devMode) {
-            sender.sendMessage("Development mode is off. Toggle dev mode as non-zero value in " + JavaPlugin.getPlugin(EnchantPlus.class).getName() + "/dev.txt");
+            final EnchantPlus plugin = JavaPlugin.getPlugin(EnchantPlus.class);
+            sender.sendMessage(String.format("Development mode is off. Toggle dev mode as non-zero value in %s/%s, and then restart the server", plugin.getName(), EnchantPlus.DEV_DATA_FILENAME));
             return true;
         }
 

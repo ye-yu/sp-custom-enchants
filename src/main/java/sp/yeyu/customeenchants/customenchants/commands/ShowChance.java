@@ -27,7 +27,9 @@ public class ShowChance implements CommandExecutor {
 
         String enchantId = EnchantUtils.getChanceVariableName(enchantment);
         final double chance = EnchantPlus.getPluginData().getPlayerData((Player) sender).getDoubleOrDefault(enchantId, 0D);
-        sender.sendMessage(String.format("You have %.02f%% chance of getting %s from the enchantment table.", chance, enchantment.getName()));
+        sender.sendMessage(String.format("You have %.02f%% chance of getting %s from the enchantment table.",
+                chance,
+                EnchantUtils.convertToDisplayName(enchantment)));
         return true;
     }
 }

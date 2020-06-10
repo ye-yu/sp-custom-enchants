@@ -8,14 +8,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
-import sp.yeyu.customeenchants.customenchants.EnchantPlus;
+import sp.yeyu.customeenchants.customenchants.managers.EnchantManager;
 import sp.yeyu.customeenchants.customenchants.utils.EnchantUtils;
 import sp.yeyu.customeenchants.customenchants.utils.EntityUtils;
 
 public class Focus extends EnchantWrapper implements Listener {
 
-    public Focus(int id, String name) {
-        super(id, name);
+    public Focus(int id, String name, Rarity rarity) {
+        super(id, name, rarity);
         this.description = "applies critical hit on each sword swing";
     }
 
@@ -58,7 +58,7 @@ public class Focus extends EnchantWrapper implements Listener {
     public void onLivingEntityHit(EntityDamageByEntityEvent target) {
         if (target.getDamager() instanceof LivingEntity) {
             LivingEntity attacker = (LivingEntity) target.getDamager();
-            if (attacker.getEquipment().getItemInHand().containsEnchantment(EnchantPlus.EnchantEnum.FOCUS_ENCHANTMENT.getEnchantment())) {
+            if (attacker.getEquipment().getItemInHand().containsEnchantment(EnchantManager.EnchantEnum.FOCUS_ENCHANTMENT.getEnchantment())) {
                 if (!EntityUtils.isValidCritical(attacker)) {
                     double damage = target.getDamage() * 1.5;
                     target.setDamage(damage);
