@@ -40,7 +40,7 @@ added in this plugin.
     - LVL 3 = 50% 
     - AXE
 
-7. Smite [Level 1-4] - A chance to strike your opponent with lightning. 
+7. Lightning [Level 1-4] - A chance to strike your opponent with lightning. 
     - LVL 1 = 10%, 
     - LVL 2 = 20%, 
     - LVL 3 = 30%, 
