@@ -13,12 +13,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import sp.yeyu.customeenchants.customenchants.commands.BuildChance;
 import sp.yeyu.customeenchants.customenchants.commands.Enchants;
 import sp.yeyu.customeenchants.customenchants.commands.ShowChance;
-import sp.yeyu.customeenchants.customenchants.managers.AnvilManager;
 import sp.yeyu.customeenchants.customenchants.enchantments.Boosted;
-import sp.yeyu.customeenchants.customenchants.managers.EnchantManager;
 import sp.yeyu.customeenchants.customenchants.enchantments.EnchantWrapper;
 import sp.yeyu.customeenchants.customenchants.enchantments.Focus;
 import sp.yeyu.customeenchants.customenchants.enchantments.Springy;
+import sp.yeyu.customeenchants.customenchants.managers.AnvilManager;
+import sp.yeyu.customeenchants.customenchants.managers.EnchantManager;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorage;
 import sp.yeyu.customeenchants.customenchants.utils.storage.DataStorageInstance;
 
